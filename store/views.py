@@ -65,17 +65,24 @@ def checkout(request):
         items = cookieData['items']
 
     if request.POST.get('make-payment-btn') == 'make-payment-btn':
-        if request.user.is_authenticated:
-            customer, created = Customer.objects.get_or_create(user=request.user)
-            order, created = Order.objects.get_or_create(customer=customer, complete=False)
-        else:
-            cookieData = cookieCart(request)
-            order = cookieData['order']
-        if request.user.is_authenticated:
-            stripe_url = product_sales_pipeline(order.id, order.get_cart_total * 100)
-        else:
-            stripe_url = product_sales_pipeline(random.random(), order['get_cart_total'] * 100)
-        return HttpResponseRedirect(stripe_url)
+        try:
+            if request.user.is_authenticated:
+                customer, created = Customer.objects.get_or_create(user=request.user)
+                order, created = Order.objects.get_or_create(customer=customer, complete=False)
+                stripe_url = product_sales_pipeline(order.id, order.get_cart_total * 100)
+            else:
+                cookieData = cookieCart(request)
+                order = cookieData['order']
+                stripe_url = product_sales_pipeline(random.random(), order['get_cart_total'] * 100)
+            
+            if stripe_url:
+                return HttpResponseRedirect(stripe_url)
+            else:
+                context = {'items': items, 'order': order, 'error': 'Payment gateway error'}
+                return render(request, 'store/checkout.html', context)
+        except Exception as e:
+            context = {'items': items, 'order': order, 'error': str(e)}
+            return render(request, 'store/checkout.html', context)
         
     context = {'items': items, 'order': order}
     return render(request, 'store/checkout.html', context)

@@ -73,7 +73,8 @@ def product_sales_pipeline(product_name, product_price):
         )
         return checkout_session.url
     except Exception as e:
-        print(f"Stripe error: {e}")
+        import sys
+        sys.stderr.write(f"Stripe error: {str(e)}\n")
         return None
 
 
@@ -99,4 +100,5 @@ Thank you for shopping with us!
             fail_silently=True,
         )
     except Exception as e:
-        print(f"Email error: {e}")
+        import sys
+        sys.stderr.write(f"Email error: {str(e)}\n")
