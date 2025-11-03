@@ -143,7 +143,31 @@ e-commerce-master/
 
 ## 🚀 Installation & Setup
 
-### Prerequisites
+### Option 1: Docker (Recommended)
+
+#### Prerequisites
+- Docker installed on your system
+- Docker Compose (optional)
+
+#### Quick Start with Docker
+```bash
+# Clone the repository
+git clone <repository-url>
+cd e-commerce-master
+
+# Build and run with Docker Compose
+docker-compose up --build
+
+# Or build and run with Docker
+docker build -t ecommerce-app .
+docker run -p 8000:8000 ecommerce-app
+```
+
+Access the application at: **http://localhost:8000**
+
+### Option 2: Manual Installation
+
+#### Prerequisites
 - Python 3.12 or higher
 - pip (Python package manager)
 - Git
@@ -202,6 +226,40 @@ python manage.py runserver
 ```
 
 Access the application at: **http://127.0.0.1:8000**
+
+---
+
+## 🐳 Docker Commands
+
+### Build Docker Image
+```bash
+docker build -t ecommerce-app .
+```
+
+### Run Docker Container
+```bash
+docker run -p 8000:8000 ecommerce-app
+```
+
+### Using Docker Compose
+```bash
+# Start services
+docker-compose up
+
+# Start in detached mode
+docker-compose up -d
+
+# Stop services
+docker-compose down
+
+# Rebuild and start
+docker-compose up --build
+```
+
+### Access Running Container
+```bash
+docker exec -it <container_id> bash
+```
 
 ---
 
