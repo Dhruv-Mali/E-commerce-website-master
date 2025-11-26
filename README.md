@@ -110,33 +110,31 @@ e-commerce-master/
 │   ├── urls.py             # App URL routing
 │   ├── utils.py            # Helper functions
 │   ├── admin.py            # Admin configuration
-│   └── templates/          # HTML templates
-│       └── store/
-│           ├── store.html
-│           ├── cart.html
-│           ├── checkout.html
-│           ├── product_detail.html
-│           └── order_history.html
+│   └── templates/store/    # HTML templates
 ├── loginsys/               # Authentication app
 │   ├── views.py            # Login/Register views
 │   ├── forms.py            # User forms
-│   └── templates/
-│       └── loginsys/
-│           ├── login.html
-│           └── registerUser.html
+│   └── templates/loginsys/ # Auth templates
 ├── static/                 # Static files
-│   ├── css/
-│   ├── js/
-│   └── images/
+│   ├── css/main.css        # Styles
+│   ├── js/cart.js          # Cart functionality
+│   └── images/             # Product images
 ├── templates/              # Base templates
 │   ├── index.html
 │   └── navbar.html
+├── scripts/                # Utility scripts
+│   ├── setup_db.py         # Database setup
+│   └── populate_database.py # Sample data
+├── docs/                   # Documentation
+│   ├── README_SETUP.md
+│   ├── STRIPE_INTEGRATION_GUIDE.md
+│   └── PROJECT_STRUCTURE.md
 ├── manage.py               # Django management
 ├── requirements.txt        # Dependencies
-├── setup_db.py             # Database setup script
-├── create_sample_data.py   # Sample data script
 ├── .env                    # Environment variables
-└── README.md               # Documentation
+├── Dockerfile              # Docker configuration
+├── docker-compose.yml      # Docker Compose
+└── README.md               # Main documentation
 ```
 
 ---
@@ -207,7 +205,7 @@ EMAIL_HOST_PASSWORD=your_email_password
 
 ### Step 5: Set Up Database
 ```bash
-python setup_db.py
+python scripts/setup_db.py
 ```
 This will:
 - Run migrations
@@ -216,7 +214,7 @@ This will:
 
 ### Step 6: Load Sample Data (Optional)
 ```bash
-python create_sample_data.py
+python scripts/populate_database.py
 ```
 This creates sample products with categories and stock.
 
