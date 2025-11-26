@@ -99,6 +99,10 @@ def order_history(request):
     customer, created = Customer.objects.get_or_create(user=request.user)
     orders = Order.objects.filter(customer=customer, complete=True).order_by('-date_ordered')
     
+    # Clean up any order items with deleted products
+    for order in orders:
+        order.orderitem_set.filter(product__isnull=True).delete()
+    
     context = {'orders': orders}
     return render(request, 'store/order_history.html', context)
 

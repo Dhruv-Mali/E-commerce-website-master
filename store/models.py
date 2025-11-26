@@ -47,7 +47,7 @@ class Order(models.Model):
         shipping = False
         orderitems = self.orderitem_set.all()
         for item in orderitems:
-            if item.product.digital == False:
+            if item.product and item.product.digital == False:
                 shipping = True
 
         return shipping
@@ -75,10 +75,12 @@ class OrderItem(models.Model):
 
     @property
     def get_total(self):
-        return self.quantity * self.product.price
+        if self.product:
+            return self.quantity * self.product.price
+        return 0
 
     def __str__(self):
-        return self.product.name
+        return self.product.name if self.product else "Deleted Product"
     
 
 

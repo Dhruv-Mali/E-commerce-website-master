@@ -39,6 +39,12 @@ function addCookieItem(productId, action) {
     }
     console.log("Updated cart:", cart);
     document.cookie = 'cart=' + JSON.stringify(cart) + ";domain=;path=/"
+    
+    // Update cart count before reload
+    if(typeof updateCartCount === 'function') {
+        updateCartCount();
+    }
+    
     location.reload()
 }
 

@@ -53,6 +53,24 @@
     }
 
     console.log('Cart:', cart)
+
+    // Update cart count in navbar
+    function updateCartCount() {
+      var cartTotal = 0;
+      for(var i in cart) {
+        cartTotal += cart[i].quantity;
+      }
+      
+      var cartBadge = document.getElementById('cart-total');
+      if(cartBadge) {
+        cartBadge.textContent = cartTotal;
+      }
+    }
+
+    // Update on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      updateCartCount();
+    });
   </script>
 
 </head>

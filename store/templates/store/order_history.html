@@ -13,6 +13,7 @@
                 <th>Order ID</th>
                 <th>Date</th>
                 <th>Items</th>
+                <th>Products</th>
                 <th>Total</th>
                 <th>Status</th>
             </tr>
@@ -23,6 +24,13 @@
                 <td>#{{order.transaction_id}}</td>
                 <td>{{order.date_ordered|date:"M d, Y"}}</td>
                 <td>{{order.get_cart_items}}</td>
+                <td>
+                    {% for item in order.orderitem_set.all %}
+                        {% if item.product %}
+                            <small>• {{item.product.name}} (x{{item.quantity}})</small><br>
+                        {% endif %}
+                    {% endfor %}
+                </td>
                 <td><img src="{% static 'images/rupee.svg' %}" /> {{order.get_cart_total|floatformat:2}}</td>
                 <td><span class="badge bg-success">Completed</span></td>
             </tr>
