@@ -1,0 +1,51 @@
+<nav class="navbar navbar-expand-lg navbar-dark" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+    <div class="container-fluid">
+      <a class="navbar-brand fw-bold" href="{% url 'store' %}">
+        <span style="font-size: 1.5rem;">🛒</span> ShopHub
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="{% url 'store' %}">Store</a>
+          </li>
+          {% if request.user.is_authenticated %}
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="{% url 'order-history' %}">Orders</a>
+          </li>
+          {% else %}
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="{% url 'login' %}">Login</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="{% url 'register' %}">Register</a>
+          </li>
+          {% endif %}
+          <li class="nav-item">
+            <a class="nav-link active position-relative" aria-current="page" href="{% url 'cart' %}">
+              🛒 Cart
+              <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="cart-total">
+                {{cartItems|default:0}}
+              </span>
+            </a>
+          </li>
+        </ul>
+        {% if request.user.is_authenticated %}
+        <div class="dropdown">
+          <a class="btn btn-link text-white text-decoration-none dropdown-toggle" href="#" role="button" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+            <div class="rounded-circle bg-white d-inline-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+              <span class="text-primary fw-bold">{{request.user.username|slice:":1"|upper}}</span>
+            </div>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
+            <li><a class="dropdown-item" href="{% url 'profile' %}">👤 Profile</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="{% url 'logout' %}">🚪 Logout</a></li>
+          </ul>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </nav>
