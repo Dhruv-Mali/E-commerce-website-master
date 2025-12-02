@@ -14,4 +14,4 @@ RUN python manage.py collectstatic --noinput
 
 EXPOSE 8000
 
-CMD ["sh", "-c", "python setup_db.py && python create_sample_data.py && python manage.py runserver 0.0.0.0:8000"]
+CMD ["sh", "-c", "python scripts/setup_db.py && python manage.py runserver 0.0.0.0:8000"]

@@ -7,9 +7,6 @@ services:
       - "8000:8000"
     volumes:
       - .:/app
-    environment:
-      - SECRET_KEY=django-insecure-%+1mlhfyx!yrqyb+y9dirh==k3o@-h1w&f*w0$e^yu&kj%)e#@
-      - STRIPE_PUBLIC_KEY=your_stripe_public_key_here
-      - STRIPE_SECRET_KEY=your_stripe_secret_key_here
-      - DEBUG=True
-    command: sh -c "python setup_db.py && python create_sample_data.py && python manage.py runserver 0.0.0.0:8000"
+    env_file:
+      - .env
+    command: sh -c "python scripts/setup_db.py && python manage.py runserver 0.0.0.0:8000"

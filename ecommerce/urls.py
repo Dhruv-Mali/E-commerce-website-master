@@ -22,9 +22,15 @@ from django.conf import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-
     path('', include('store.urls')),
     path('l/', include('loginsys.urls')),
 ]
+
+# Conditionally include extended URLs if available
+try:
+    from store import urls_extended
+    urlpatterns.append(path('extended/', include('store.urls_extended')))
+except (ImportError, ModuleNotFoundError):
+    pass  # Extended URLs not yet available
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

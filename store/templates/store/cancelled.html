@@ -1,6 +1,19 @@
+{% extends 'index.html' %}
+{% load static %}
 
-<a href="{% url 'store' %}">Home Page</a>
+{% block content %}
 
-<script>
-    alert("Transaction cancelled!!")
-</script>
+<div class="text-center mt-5">
+    <div class="alert alert-warning" role="alert">
+        <h2>❌ Payment Cancelled</h2>
+        <p class="lead">Your transaction has been cancelled.</p>
+        <p>No charges were made to your account.</p>
+    </div>
+    
+    <div class="mt-4">
+        <a href="{% url 'store' %}" class="btn btn-primary btn-lg">Continue Shopping</a>
+        <a href="{% url 'cart' %}" class="btn btn-outline-secondary btn-lg">Back to Cart</a>
+    </div>
+</div>
+
+{% endblock content %}
