@@ -2,7 +2,7 @@ import stripe
 from django.conf import settings
 from django.core.mail import send_mail
 import json
-from .models import *
+from .models import Product, Customer, Order, OrderItem, ShippingAddress
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
@@ -48,34 +48,24 @@ def cookieCart(request):
 def product_sales_pipeline(product_name, product_price):
     try:
         stripe_product_obj = stripe.Product.create(name=str(product_name))
-        stripe_product_id = stripe_product_obj.id
         stripe_price_obj = stripe.Price.create(
-            product=stripe_product_id,
+            product=stripe_product_obj.id,
             unit_amount=int(product_price),
             currency='inr'
         )
         
-        # Use localhost for development
         base_endpoint = 'http://127.0.0.1:8000'
-        success_url = f"{base_endpoint}/"
-        cancel_url = f"{base_endpoint}/payments/cancelled/"
-
         checkout_session = stripe.checkout.Session.create(
-            line_items=[
-                {
-                    'price': stripe_price_obj.id,
-                    'quantity': 1,
-                }
-            ],
+            line_items=[{'price': stripe_price_obj.id, 'quantity': 1}],
             mode='payment',
-            success_url=success_url,
-            cancel_url=cancel_url
+            success_url=f"{base_endpoint}/payment-success/?session_id={{CHECKOUT_SESSION_ID}}",
+            cancel_url=f"{base_endpoint}/payment-cancelled/"
         )
         return checkout_session.url
+    except stripe.error.AuthenticationError:
+        raise Exception("Invalid Stripe API keys. Please check your keys at https://dashboard.stripe.com/test/apikeys")
     except Exception as e:
-        import sys
-        sys.stderr.write(f"Stripe error: {str(e)}\n")
-        return None
+        raise Exception(f"Stripe error: {str(e)}")
 
 
 def send_order_confirmation_email(email, order):

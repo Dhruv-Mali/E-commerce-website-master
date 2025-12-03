@@ -1,5 +1,16 @@
+/* Main CSS - Dark Theme */
+:root {
+    --primary: #0D0D0D;
+    --accent-purple: #7B61FF;
+    --soft-purple: #A196FF;
+    --neon-blue: #00C2FF;
+    --text: #EDEDED;
+    --bg-dark: #1a1a1a;
+}
+
 body {
-    background-color: #f8f9fa;
+    background-color: var(--primary);
+    color: var(--text);
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
@@ -11,7 +22,7 @@ body {
 }
 
 .custom-shadow {
-    box-shadow: rgba(14, 30, 37, 0.12) 0px 2px 4px 0px, rgba(14, 30, 37, 0.32) 0px 2px 16px 0px;
+    box-shadow: 0 4px 20px rgba(123,97,255,0.3);
 }
 
 .quantity {
@@ -30,12 +41,15 @@ body {
 
 /* Modern Enhancements */
 .navbar {
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 10px rgba(123,97,255,0.3);
 }
 
 .card {
     border-radius: 10px;
     overflow: hidden;
+    background: var(--bg-dark);
+    color: var(--text);
+    border: 1px solid rgba(123,97,255,0.3);
 }
 
 .btn {
@@ -55,27 +69,33 @@ body {
 
 .form-control, .form-select {
     border-radius: 8px;
-    border: 2px solid #e0e0e0;
+    border: 2px solid rgba(123,97,255,0.3);
+    background: var(--bg-dark);
+    color: var(--text);
 }
 
 .form-control:focus, .form-select:focus {
-    border-color: #0d6efd;
-    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+    border-color: var(--accent-purple);
+    box-shadow: 0 0 0 0.2rem rgba(123,97,255,0.25);
+    background: var(--bg-dark);
+    color: var(--text);
 }
 
 .bg-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    background: linear-gradient(135deg, var(--accent-purple) 0%, var(--neon-blue) 100%) !important;
 }
 
 .text-primary {
-    color: #667eea !important;
+    color: var(--accent-purple) !important;
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, var(--accent-purple) 0%, var(--neon-blue) 100%);
     border: none;
+    color: var(--text);
 }
 
 .btn-primary:hover {
-    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    background: linear-gradient(135deg, var(--neon-blue) 0%, var(--accent-purple) 100%);
+    box-shadow: 0 5px 20px rgba(123,97,255,0.4);
 }

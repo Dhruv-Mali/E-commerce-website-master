@@ -11,7 +11,10 @@ def cart_context(request):
                 user=request.user,
                 defaults={'name': request.user.username, 'email': request.user.email}
             )
-        order, created = Order.objects.get_or_create(customer=customer, complete=False)
+        # Get the most recent incomplete order or create a new one
+        order = Order.objects.filter(customer=customer, complete=False).first()
+        if not order:
+            order = Order.objects.create(customer=customer, complete=False)
         cartItems = order.get_cart_items
     else:
         cookieData = cookieCart(request)

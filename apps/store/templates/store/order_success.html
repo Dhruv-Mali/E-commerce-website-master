@@ -1,0 +1,59 @@
+{% extends 'index.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-0 shadow-lg">
+                <div class="card-body text-center p-5">
+                    <div class="mb-4">
+                        <div class="rounded-circle bg-success d-inline-flex align-items-center justify-content-center" style="width: 100px; height: 100px;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" fill="white" class="bi bi-check-lg" viewBox="0 0 16 16">
+                                <path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425a.247.247 0 0 1 .02-.022Z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    
+                    <h1 class="display-5 fw-bold text-success mb-3">Order Placed Successfully!</h1>
+                    <p class="lead text-muted mb-4">Thank you for your purchase. Your order has been confirmed.</p>
+                    
+                    {% if order %}
+                    <div class="bg-light rounded p-4 mb-4">
+                        <div class="row text-start">
+                            <div class="col-md-6 mb-3">
+                                <small class="text-muted">Order ID</small>
+                                <p class="fw-bold mb-0">{{order.transaction_id}}</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <small class="text-muted">Order Total</small>
+                                <p class="fw-bold mb-0">₹{{order.get_cart_total|floatformat:0}}</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <small class="text-muted">Items</small>
+                                <p class="fw-bold mb-0">{{order.get_cart_items}}</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <small class="text-muted">Status</small>
+                                <p class="fw-bold mb-0 text-success">{{order.status|title}}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <p class="mb-4">A confirmation email has been sent to your email address.</p>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                        <a href="{% url 'store' %}" class="btn btn-primary btn-lg px-4">Continue Shopping</a>
+                        {% if request.user.is_authenticated %}
+                        <a href="{% url 'order-history' %}" class="btn btn-outline-secondary btn-lg px-4">View Orders</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}

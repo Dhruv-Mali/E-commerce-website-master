@@ -1,0 +1,56 @@
+/* Tech & Electronics Theme */
+body {
+    background-color: #f5f5f7;
+    color: #000000ea;
+}
+
+/* Navbar */
+.navbar {
+    background: #000000 !important;
+}
+
+/* Cards */
+.card {
+    background: #ffffff;
+    border: 1px solid #424245;
+    box-shadow: 0 2px 8px rgba(66, 66, 69, 0.1);
+}
+
+/* Buttons */
+.btn-primary {
+    background-color: #000000;
+    border-color: #000000;
+    color: #ffffff;
+}
+
+.btn-primary:hover {
+    background-color: #424245;
+    border-color: #424245;
+}
+
+.btn-outline-primary {
+    color: #000000;
+    border-color: #424245;
+}
+
+.btn-outline-primary:hover {
+    background-color: #000000;
+    border-color: #000000;
+    color: #ffffff;
+}
+
+/* Badges */
+.badge {
+    background-color: #424245;
+}
+
+/* Form Controls */
+.form-control, .form-select {
+    border: 1px solid #424245;
+    background-color: #ffffff;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #000000;
+    box-shadow: 0 0 0 0.2rem rgba(0, 0, 0, 0.25);
+}

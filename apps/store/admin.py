@@ -1,10 +1,22 @@
 from django.contrib import admin
-from .models import *
+from .models import Product, Customer, Order, OrderItem, ShippingAddress
+
+# Customize admin site headers
+admin.site.site_header = "Phone Store Admin"
+admin.site.site_title = "Phone Store"
+admin.site.index_title = "Welcome to Phone Store Administration"
 
 @admin.register(Customer)
 class CustomerAdmin(admin.ModelAdmin):
-    list_display = ['name', 'email', 'user']
+    list_display = ['name', 'email', 'user', 'get_total_orders']
     search_fields = ['name', 'email']
+    list_filter = ['user__date_joined']
+    readonly_fields = ['get_total_orders']
+    list_per_page = 25
+    
+    def get_total_orders(self, obj):
+        return obj.order_set.filter(complete=True).count()
+    get_total_orders.short_description = 'Total Orders'
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
@@ -12,13 +24,51 @@ class ProductAdmin(admin.ModelAdmin):
     list_filter = ['category', 'digital']
     search_fields = ['name', 'description']
     list_editable = ['price', 'stock']
+    readonly_fields = ['created_at', 'updated_at', 'views']
+    fieldsets = (
+        ('Basic Information', {
+            'fields': ('name', 'description', 'image')
+        }),
+        ('Pricing & Inventory', {
+            'fields': ('price', 'stock', 'digital')
+        }),
+        ('Category', {
+            'fields': ('category',)
+        }),
+        ('Statistics', {
+            'fields': ('views', 'created_at', 'updated_at'),
+            'classes': ('collapse',)
+        })
+    )
+    list_per_page = 20
+
+class OrderItemInline(admin.TabularInline):
+    model = OrderItem
+    extra = 0
+    readonly_fields = ['get_total']
+    fields = ['product', 'quantity', 'get_total']
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ['id', 'customer', 'date_ordered', 'status', 'complete', 'transaction_id', 'get_cart_total']
+    list_display = ['id', 'customer', 'date_ordered', 'status', 'complete', 'get_cart_total']
     list_filter = ['complete', 'status', 'date_ordered']
     search_fields = ['transaction_id', 'customer__name']
+    readonly_fields = ['date_ordered', 'get_cart_total', 'get_cart_items']
+    inlines = [OrderItemInline]
     actions = ['confirm_order', 'mark_processing', 'mark_shipped', 'mark_delivered']
+    fieldsets = (
+        ('Order Details', {
+            'fields': ('customer', 'complete', 'status')
+        }),
+        ('Payment Information', {
+            'fields': ('transaction_id', 'stripe_payment_intent')
+        }),
+        ('Order Summary', {
+            'fields': ('get_cart_total', 'get_cart_items', 'date_ordered'),
+            'classes': ('collapse',)
+        })
+    )
+    list_per_page = 25
     
     def confirm_order(self, request, queryset):
         updated = queryset.update(complete=True, status='processing')
@@ -42,8 +92,10 @@ class OrderAdmin(admin.ModelAdmin):
 
 @admin.register(OrderItem)
 class OrderItemAdmin(admin.ModelAdmin):
-    list_display = ['order', 'product', 'quantity', 'date_added']
+    list_display = ['order', 'product', 'quantity', 'get_total', 'date_added']
     list_filter = ['date_added']
+    readonly_fields = ['get_total', 'date_added']
+    list_per_page = 30
 
 @admin.register(ShippingAddress)
 class ShippingAddressAdmin(admin.ModelAdmin):

@@ -1,0 +1,299 @@
+/* Modern Dark Theme - E-commerce */
+
+/* Color Variables */
+:root {
+    --primary: #0D0D0D;
+    --accent-purple: #7B61FF;
+    --soft-purple: #A196FF;
+    --neon-blue: #00C2FF;
+    --text: #EDEDED;
+    --bg-dark: #1a1a1a;
+}
+
+/* Global Styles */
+body {
+    background-color: var(--primary);
+    color: var(--text);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* Navbar */
+.navbar {
+    background: var(--primary) !important;
+    border-bottom: 2px solid var(--accent-purple);
+    box-shadow: 0 2px 10px rgba(123,97,255,0.2);
+}
+
+.navbar-brand, .nav-link {
+    color: var(--text) !important;
+}
+
+.nav-link:hover {
+    color: var(--neon-blue) !important;
+}
+
+.navbar-brand:hover {
+    color: var(--accent-purple) !important;
+}
+
+/* Buttons */
+.btn-primary {
+    background: linear-gradient(135deg, var(--accent-purple) 0%, var(--neon-blue) 100%);
+    border: none;
+    color: var(--text);
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.btn-primary:hover, .btn-primary:focus {
+    background: linear-gradient(135deg, var(--neon-blue) 0%, var(--accent-purple) 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(123,97,255,0.4);
+}
+
+.btn-outline-primary {
+    color: var(--accent-purple);
+    border-color: var(--accent-purple);
+    background: transparent;
+}
+
+.btn-outline-primary:hover {
+    background: var(--accent-purple);
+    border-color: var(--accent-purple);
+    color: var(--text);
+}
+
+.btn-success {
+    background: var(--neon-blue);
+    border: none;
+    color: var(--primary);
+    font-weight: 600;
+}
+
+.btn-success:hover {
+    background: var(--soft-purple);
+    color: var(--text);
+}
+
+.btn-outline-secondary {
+    border-color: var(--accent-purple);
+    color: var(--accent-purple);
+}
+
+.btn-outline-secondary:hover {
+    background: var(--accent-purple);
+    color: var(--text);
+}
+
+/* Cards */
+.card {
+    background: var(--bg-dark);
+    border: 1px solid rgba(123,97,255,0.3);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    transition: all 0.3s;
+    color: var(--text);
+}
+
+.card:hover {
+    box-shadow: 0 8px 25px rgba(123,97,255,0.4);
+}
+
+.custom-shadow {
+    box-shadow: 0 4px 15px rgba(123,97,255,0.2);
+}
+
+/* Product Cards */
+.hover-card {
+    transition: all 0.3s ease;
+    border: 1px solid rgba(123,97,255,0.3);
+    background: var(--bg-dark);
+    color: var(--text);
+}
+
+.hover-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(123,97,255,0.4);
+    border-color: var(--accent-purple);
+}
+
+/* Badges */
+.badge {
+    font-weight: 600;
+}
+
+.badge.bg-secondary {
+    background-color: var(--accent-purple) !important;
+}
+
+.badge.bg-info {
+    background-color: var(--neon-blue) !important;
+}
+
+/* Text Colors */
+.text-primary {
+    color: var(--accent-purple) !important;
+}
+
+.text-success {
+    color: var(--neon-blue) !important;
+}
+
+/* Forms */
+.form-control, .form-select {
+    border: 2px solid rgba(123,97,255,0.3);
+    transition: all 0.3s;
+    background: var(--bg-dark);
+    color: var(--text);
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--accent-purple);
+    box-shadow: 0 0 0 0.2rem rgba(123,97,255,0.25);
+    background: var(--bg-dark);
+    color: var(--text);
+}
+
+/* Search Section */
+.search-section {
+    background: var(--bg-dark);
+    border: 2px solid var(--accent-purple);
+    border-radius: 15px;
+}
+
+/* Store Header */
+.store-header {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--bg-dark) 100%);
+    color: var(--text);
+    padding: 3rem 0;
+    margin-bottom: 2rem;
+    border-radius: 15px;
+}
+
+/* Cart */
+.cart-header {
+    background: linear-gradient(135deg, var(--accent-purple) 0%, var(--neon-blue) 100%);
+    color: var(--text);
+    padding: 1.5rem;
+    border-radius: 10px;
+}
+
+/* Alerts */
+.alert-info {
+    background-color: rgba(123,97,255,0.2);
+    border-color: var(--accent-purple);
+    color: var(--text);
+}
+
+.alert-success {
+    background-color: rgba(0,194,255,0.2);
+    border-color: var(--neon-blue);
+    color: var(--text);
+}
+
+.alert-warning {
+    background-color: rgba(161,150,255,0.2);
+    border-color: var(--soft-purple);
+    color: var(--text);
+}
+
+/* Tables */
+.table {
+    color: var(--text);
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(123,97,255,0.2);
+}
+
+.table-borderless {
+    color: var(--text);
+}
+
+/* Dropdown */
+.dropdown-menu {
+    background: var(--bg-dark);
+    border: 1px solid var(--accent-purple);
+    box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+}
+
+.dropdown-item {
+    color: var(--text);
+}
+
+.dropdown-item:hover {
+    background-color: rgba(123,97,255,0.3);
+    color: var(--neon-blue);
+}
+
+/* Footer */
+footer {
+    background: var(--primary);
+    color: var(--text);
+}
+
+footer a {
+    color: var(--soft-purple);
+    transition: color 0.3s;
+}
+
+footer a:hover {
+    color: var(--neon-blue);
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.6s ease-out;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--primary);
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, var(--accent-purple) 0%, var(--neon-blue) 100%);
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-purple);
+}
+
+/* Additional Dark Theme Elements */
+.bg-light {
+    background-color: var(--bg-dark) !important;
+}
+
+.text-muted {
+    color: rgba(237,237,237,0.6) !important;
+}
+
+.border {
+    border-color: rgba(123,97,255,0.3) !important;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: var(--text);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .store-header {
+        padding: 2rem 0;
+    }
+}

@@ -1,0 +1,67 @@
+<!-- Footer -->
+<footer class="footer mt-5" style="background: #0D0D0D; color: #EDEDED; border-top: 2px solid #7B61FF;">
+    <div class="container py-4">
+        <div class="row align-items-center">
+            <div class="col-md-4 mb-3 mb-md-0">
+                <h5 class="fw-bold mb-2">
+                    <span style="color: #7B61FF;">⚡</span> TechHub
+                </h5>
+                <p class="mb-0 small">India's most trusted tech store</p>
+            </div>
+            
+            <div class="col-md-4 mb-3 mb-md-0 text-center">
+                <div class="social-links">
+                    <a href="#" class="text-light me-3"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="text-light me-3"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="text-light me-3"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="text-light"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+            
+            <div class="col-md-4 text-md-end">
+                <a href="{% url 'store' %}" class="text-light text-decoration-none me-3 small">Store</a>
+                <a href="{% url 'cart' %}" class="text-light text-decoration-none me-3 small">Cart</a>
+                {% if request.user.is_authenticated %}
+                <a href="{% url 'order-history' %}" class="text-light text-decoration-none small">Orders</a>
+                {% else %}
+                <a href="{% url 'login' %}" class="text-light text-decoration-none small">Login</a>
+                {% endif %}
+            </div>
+        </div>
+        
+        <hr style="border-color: rgba(123,97,255,0.3); margin: 1rem 0;">
+        
+        <div class="row align-items-center">
+            <div class="col-md-6 text-center text-md-start">
+                <p class="mb-0 small">&copy; 2024 TechHub. All rights reserved.</p>
+            </div>
+            <div class="col-md-6 text-center text-md-end">
+                <span class="badge me-2" style="background: #7B61FF;">🔒 SSL Secured</span>
+                <span class="badge" style="background: #00C2FF; color: #0D0D0D;">💳 Safe Payments</span>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<style>
+.footer a:hover {
+    color: #7B61FF !important;
+    transition: color 0.3s ease;
+}
+
+.social-links a {
+    display: inline-block;
+    width: 35px;
+    height: 35px;
+    line-height: 35px;
+    text-align: center;
+    border-radius: 50%;
+    background: rgba(123,97,255,0.2);
+    transition: all 0.3s ease;
+}
+
+.social-links a:hover {
+    background: #7B61FF;
+    transform: translateY(-2px);
+}
+</style>

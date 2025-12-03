@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse, HttpResponseRedirect
 from django.core.mail import send_mail
 from django.conf import settings
@@ -7,6 +7,8 @@ from django.core.paginator import Paginator
 from django.views.decorators.http import require_POST
 from django.db import transaction
 from django.core.exceptions import ValidationError
+from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib import messages
 import json
 import datetime
 import random
@@ -15,7 +17,7 @@ import stripe
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
 from .utils import cookieCart, product_sales_pipeline, send_order_confirmation_email
-from .models import *
+from .models import Product, Customer, Order, OrderItem, ShippingAddress
 
 # Import validators with fallback
 try:
@@ -34,6 +36,90 @@ except ImportError:
     def sanitize_search_query(query):
         return query.strip()[:100] if query else ""
 
+# Custom Admin Views
+@staff_member_required
+def admin_dashboard(request):
+    context = {
+        'total_products': Product.objects.count(),
+        'total_orders': Order.objects.filter(complete=True).count(),
+        'total_customers': Customer.objects.count(),
+        'pending_orders': Order.objects.filter(complete=False).count(),
+    }
+    return render(request, 'admin/dashboard.html', context)
+
+@staff_member_required
+def admin_products(request):
+    products = Product.objects.all().order_by('-created_at')
+    context = {'products': products}
+    return render(request, 'admin/products.html', context)
+
+@staff_member_required
+def admin_add_product(request):
+    from .forms import ProductForm
+    
+    if request.method == 'POST':
+        form = ProductForm(request.POST, request.FILES)
+        if form.is_valid():
+            product = form.save()
+            messages.success(request, f'Product "{product.name}" added successfully!')
+            return redirect('admin_products')
+    else:
+        form = ProductForm()
+    
+    context = {'form': form}
+    return render(request, 'admin/add_product.html', context)
+
+@staff_member_required
+def admin_edit_product(request, product_id):
+    from .forms import ProductForm
+    
+    product = get_object_or_404(Product, id=product_id)
+    
+    if request.method == 'POST':
+        form = ProductForm(request.POST, request.FILES, instance=product)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f'Product "{product.name}" updated successfully!')
+            return redirect('admin_products')
+    else:
+        form = ProductForm(instance=product)
+    
+    context = {'form': form, 'product': product}
+    return render(request, 'admin/edit_product.html', context)
+
+@staff_member_required
+def admin_delete_product(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    
+    if request.method == 'POST':
+        product_name = product.name
+        product.delete()
+        messages.success(request, f'Product "{product_name}" deleted successfully!')
+        return redirect('admin_products')
+    
+    context = {'product': product}
+    return render(request, 'admin/delete_product.html', context)
+
+@staff_member_required
+def admin_orders(request):
+    orders = Order.objects.filter(complete=True).order_by('-date_ordered')
+    
+    if request.method == 'POST':
+        # Handle order status updates
+        order_id = request.POST.get('order_id')
+        new_status = request.POST.get('status')
+        if order_id and new_status:
+            order = get_object_or_404(Order, id=order_id)
+            order.status = new_status
+            order.save()
+            messages.success(request, f'Order #{order.id} status updated to {new_status}!')
+            return redirect('admin_orders')
+    
+    context = {'orders': orders}
+    return render(request, 'admin/orders.html', context)
+
+def landing(request):
+    return render(request, 'store/landing.html')
 
 def store(request):
     query = sanitize_search_query(request.GET.get('q', ''))
@@ -72,6 +158,7 @@ def store(request):
         'categories': categories,
         'selected_category': category,
         'sort_by': sort_by,
+        'total_products': products.count(),
     }
     return render(request, 'store/store.html', context)
 
@@ -82,7 +169,10 @@ def cart(request):
             user=request.user,
             defaults={'name': request.user.username, 'email': request.user.email}
         )
-        order, created = Order.objects.get_or_create(customer=customer, complete=False)
+        # Get the most recent incomplete order or create a new one
+        order = Order.objects.filter(customer=customer, complete=False).first()
+        if not order:
+            order = Order.objects.create(customer=customer, complete=False)
         items = order.orderitem_set.all()
     else:
         cookieData = cookieCart(request)
@@ -99,35 +189,42 @@ def checkout(request):
             user=request.user,
             defaults={'name': request.user.username, 'email': request.user.email}
         )
-        order, created = Order.objects.get_or_create(customer=customer, complete=False)
+        order = Order.objects.filter(customer=customer, complete=False).first()
+        if not order:
+            order = Order.objects.create(customer=customer, complete=False)
         items = order.orderitem_set.all()
     else:
         cookieData = cookieCart(request)
         order = cookieData['order']
         items = cookieData['items']
 
-    if request.POST.get('make-payment-btn') == 'make-payment-btn':
+    if request.method == 'POST' and request.POST.get('make-payment-btn'):
         try:
             if request.user.is_authenticated:
-                customer, created = Customer.objects.get_or_create(
-                    user=request.user,
-                    defaults={'name': request.user.username, 'email': request.user.email}
-                )
-                order, created = Order.objects.get_or_create(customer=customer, complete=False)
-                stripe_url = product_sales_pipeline(order.id, order.get_cart_total * 100)
+                order_id = order.id
+                total_amount = order.get_cart_total
             else:
-                cookieData = cookieCart(request)
-                order = cookieData['order']
-                stripe_url = product_sales_pipeline(random.random(), order['get_cart_total'] * 100)
+                order_id = f"guest_{random.randint(1000, 9999)}"
+                total_amount = order['get_cart_total']
+            
+            stripe_url = product_sales_pipeline(order_id, int(total_amount * 100))
             
             if stripe_url:
+                # Store order data in session for processing after payment
+                request.session['pending_order_id'] = order_id if request.user.is_authenticated else None
+                request.session['order_data'] = {
+                    'name': request.POST.get('name', ''),
+                    'email': request.POST.get('email', ''),
+                    'address': request.POST.get('address', ''),
+                    'city': request.POST.get('city', ''),
+                    'state': request.POST.get('state', ''),
+                    'zipcode': request.POST.get('zipcode', '')
+                }
                 return HttpResponseRedirect(stripe_url)
             else:
-                context = {'items': items, 'order': order, 'error': 'Payment gateway error'}
-                return render(request, 'store/checkout.html', context)
+                messages.error(request, 'Payment gateway error. Please try again.')
         except Exception as e:
-            context = {'items': items, 'order': order, 'error': str(e)}
-            return render(request, 'store/checkout.html', context)
+            messages.error(request, f'Error: {str(e)}')
         
     context = {'items': items, 'order': order}
     return render(request, 'store/checkout.html', context)
@@ -173,8 +270,65 @@ def order_history(request):
     context = {'orders': orders}
     return render(request, 'store/order_history.html', context)
 
-def cancelled(request):
-    return render(request, 'store/cancelled.html')
+def payment_cancelled(request):
+    messages.warning(request, 'Payment was cancelled. Your cart is still saved.')
+    return redirect('checkout')
+
+def payment_success(request):
+    session_id = request.GET.get('session_id')
+    order = None
+    
+    if session_id and request.user.is_authenticated:
+        try:
+            with transaction.atomic():
+                customer = Customer.objects.get(user=request.user)
+                order = Order.objects.filter(customer=customer, complete=False).first()
+                
+                if order:
+                    # Get order data from session
+                    order_data = request.session.get('order_data', {})
+                    
+                    # Complete the order
+                    order.transaction_id = Order.generate_transaction_id()
+                    order.stripe_payment_intent = session_id
+                    order.complete = True
+                    order.status = 'processing'
+                    order.save()
+                    
+                    # Reduce stock
+                    for item in order.orderitem_set.all():
+                        if item.product:
+                            item.product.reduce_stock(item.quantity)
+                    
+                    # Save shipping address if provided
+                    if order_data.get('address'):
+                        ShippingAddress.objects.create(
+                            customer=customer,
+                            order=order,
+                            address=order_data.get('address', ''),
+                            city=order_data.get('city', ''),
+                            state=order_data.get('state', ''),
+                            zipcode=order_data.get('zipcode', '')
+                        )
+                    
+                    # Send confirmation email
+                    if customer.email:
+                        send_order_confirmation_email(customer.email, order)
+                    
+                    # Clear session data
+                    request.session.pop('pending_order_id', None)
+                    request.session.pop('order_data', None)
+                    
+                    messages.success(request, f'Payment successful! Order #{order.transaction_id} has been placed.')
+                    return render(request, 'store/order_success.html', {'order': order})
+                else:
+                    messages.info(request, 'Payment received but order not found.')
+        except Exception as e:
+            messages.error(request, f'Error processing order: {str(e)}')
+    else:
+        messages.success(request, 'Payment successful!')
+    
+    return redirect('store')
 
 @require_POST
 def updateItem(request):
@@ -195,7 +349,10 @@ def updateItem(request):
                 defaults={'name': request.user.username, 'email': request.user.email}
             )
             product = Product.objects.select_for_update().get(id=productId)
-            order, created = Order.objects.get_or_create(customer=customer, complete=False)
+            # Get the most recent incomplete order or create a new one
+            order = Order.objects.filter(customer=customer, complete=False).first()
+            if not order:
+                order = Order.objects.create(customer=customer, complete=False)
             orderItem, created = OrderItem.objects.get_or_create(order=order, product=product)
 
             if action == 'add':
@@ -231,7 +388,10 @@ def processOrder(request):
                     user=request.user,
                     defaults={'name': request.user.username, 'email': request.user.email}
                 )
-                order, created = Order.objects.get_or_create(customer=customer, complete=False)
+                # Get the most recent incomplete order or create a new one
+                order = Order.objects.filter(customer=customer, complete=False).first()
+                if not order:
+                    order = Order.objects.create(customer=customer, complete=False)
             else:
                 name = data['form']['name']
                 email = data['form']['email']

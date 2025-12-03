@@ -61,13 +61,22 @@ function updateUserOrder(productId, action) {
         },
         body: JSON.stringify({'productId': productId, 'action': action})
     })
-
     .then((response) => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
         return response.json()
     })
-
     .then((data) => {
         console.log('Data: ', data);
-        location.reload()
+        if(data.success) {
+            location.reload()
+        } else if(data.error) {
+            alert(data.error);
+        }
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+        alert('Failed to update cart. Please try again.');
     })
 }

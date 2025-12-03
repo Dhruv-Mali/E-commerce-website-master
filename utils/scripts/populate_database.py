@@ -8,49 +8,50 @@ import sys
 import django
 from dotenv import load_dotenv
 
-# Add parent directory to path
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# Add project root to path
+project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(0, project_root)
+os.chdir(project_root)
 
 load_dotenv()
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'ecommerce.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.ecommerce.settings')
 django.setup()
 
-from store.models import Product
+from apps.store.models import Product
 
 PRODUCTS = [
-    # Electronics
-    {'name': 'Wireless Headphones', 'price': 2499, 'digital': False, 'category': 'Electronics', 'stock': 45, 'description': 'Premium wireless headphones with noise cancellation', 'image': 'images/headphone.jpg'},
-    {'name': 'Smartwatch', 'price': 3999, 'digital': False, 'category': 'Electronics', 'stock': 30, 'description': 'Fitness tracking smartwatch with heart rate monitor', 'image': 'images/watch.jpg'},
-    {'name': 'Bluetooth Speaker', 'price': 1899, 'digital': False, 'category': 'Electronics', 'stock': 50, 'description': 'Portable wireless speaker with rich bass', 'image': 'images/bluetooth_speaker.jpg'},
-    {'name': 'Laptop', 'price': 54999, 'digital': False, 'category': 'Electronics', 'stock': 15, 'description': 'High-performance laptop for work and gaming', 'image': 'images/laptop.jpg'},
-    {'name': 'Smartphone', 'price': 29999, 'digital': False, 'category': 'Electronics', 'stock': 25, 'description': 'Latest smartphone with advanced camera system', 'image': 'images/smartphone.jpg'},
-    {'name': 'Wireless Mouse', 'price': 799, 'digital': False, 'category': 'Electronics', 'stock': 60, 'description': 'Ergonomic wireless mouse with precision tracking', 'image': 'images/wireless_mouse.jpg'},
-    {'name': 'Fitness Tracker', 'price': 2499, 'digital': False, 'category': 'Electronics', 'stock': 40, 'description': 'Smart fitness band with activity tracking', 'image': 'images/fitness_tracker.jpg'},
+    # iPhone Models
+    {'name': 'iPhone 15 Pro Max', 'price': 134900, 'digital': False, 'category': 'Smartphones', 'stock': 25, 'description': 'Latest iPhone with A17 Pro chip, titanium design, and advanced camera system'},
+    {'name': 'iPhone 15 Pro', 'price': 124900, 'digital': False, 'category': 'Smartphones', 'stock': 30, 'description': 'iPhone 15 Pro with A17 Pro chip and premium features'},
+    {'name': 'iPhone 15 Plus', 'price': 89900, 'digital': False, 'category': 'Smartphones', 'stock': 30, 'description': 'iPhone 15 Plus with larger display and all-day battery'},
+    {'name': 'iPhone 15', 'price': 79900, 'digital': False, 'category': 'Smartphones', 'stock': 40, 'description': 'iPhone 15 with Dynamic Island and improved cameras'},
+    {'name': 'iPhone 14 Plus', 'price': 79900, 'digital': False, 'category': 'Smartphones', 'stock': 25, 'description': 'iPhone 14 Plus with 6.7-inch display'},
+    {'name': 'iPhone 14', 'price': 69900, 'digital': False, 'category': 'Smartphones', 'stock': 35, 'description': 'iPhone 14 with A15 Bionic chip and dual camera system'},
+    {'name': 'iPhone 13', 'price': 59900, 'digital': False, 'category': 'Smartphones', 'stock': 20, 'description': 'iPhone 13 with A15 Bionic and cinematic mode'},
+    {'name': 'iPhone 12', 'price': 49900, 'digital': False, 'category': 'Smartphones', 'stock': 15, 'description': 'iPhone 12 with A14 Bionic and 5G capability'},
+    {'name': 'iPhone SE (3rd Gen)', 'price': 43900, 'digital': False, 'category': 'Smartphones', 'stock': 20, 'description': 'Compact iPhone with A15 Bionic chip'},
     
-    # Clothing & Fashion
-    {'name': 'Cotton T-Shirt', 'price': 599, 'digital': False, 'category': 'Clothing', 'stock': 100, 'description': 'Comfortable cotton t-shirt for everyday wear', 'image': 'images/tshirt.jpg'},
-    {'name': 'Denim Jeans', 'price': 1499, 'digital': False, 'category': 'Clothing', 'stock': 75, 'description': 'Classic fit denim jeans with premium fabric', 'image': 'images/jeans.jpg'},
-    {'name': 'Hoodie', 'price': 1899, 'digital': False, 'category': 'Clothing', 'stock': 50, 'description': 'Warm and cozy hoodie for winter', 'image': 'images/hoodie.jpg'},
+    # Samsung Galaxy Z Series (Foldables)
+    {'name': 'Samsung Galaxy Z Fold5', 'price': 154999, 'digital': False, 'category': 'Smartphones', 'stock': 8, 'description': 'Revolutionary foldable smartphone'},
+    {'name': 'Samsung Galaxy Z Flip5', 'price': 99999, 'digital': False, 'category': 'Smartphones', 'stock': 10, 'description': 'Compact flip phone with modern features'},
     
-    # Footwear
-    {'name': 'Running Shoes', 'price': 3499, 'digital': False, 'category': 'Footwear', 'stock': 40, 'description': 'Lightweight running shoes with cushioned sole', 'image': 'images/shoe.jpg'},
-    {'name': 'Sneakers', 'price': 2999, 'digital': False, 'category': 'Footwear', 'stock': 55, 'description': 'Trendy sneakers for casual wear', 'image': 'images/sneakers.jpg'},
+    # Samsung Galaxy S Series
+    {'name': 'Samsung Galaxy S24 Ultra', 'price': 129999, 'digital': False, 'category': 'Smartphones', 'stock': 20, 'description': 'Premium Samsung flagship with S Pen and AI features'},
+    {'name': 'Samsung Galaxy S23 Ultra', 'price': 124999, 'digital': False, 'category': 'Smartphones', 'stock': 18, 'description': 'Galaxy S23 Ultra with 200MP camera and S Pen'},
+    {'name': 'Samsung Galaxy S24+', 'price': 99999, 'digital': False, 'category': 'Smartphones', 'stock': 25, 'description': 'Galaxy S24+ with enhanced display and camera'},
+    {'name': 'Samsung Galaxy S23+', 'price': 94999, 'digital': False, 'category': 'Smartphones', 'stock': 22, 'description': 'Galaxy S23+ with enhanced performance'},
+    {'name': 'Samsung Galaxy S24', 'price': 79999, 'digital': False, 'category': 'Smartphones', 'stock': 30, 'description': 'Latest Galaxy S24 with advanced AI capabilities'},
+    {'name': 'Samsung Galaxy S23', 'price': 69999, 'digital': False, 'category': 'Smartphones', 'stock': 25, 'description': 'Galaxy S23 with improved night photography'},
+    {'name': 'Samsung Galaxy S22', 'price': 57999, 'digital': False, 'category': 'Smartphones', 'stock': 20, 'description': 'Galaxy S22 with improved camera system'},
     
-    # Accessories
-    {'name': 'Sunglasses', 'price': 1299, 'digital': False, 'category': 'Accessories', 'stock': 70, 'description': 'UV protection sunglasses with stylish design', 'image': 'images/sunglasses.jpg'},
-    {'name': 'Travel Backpack', 'price': 1999, 'digital': False, 'category': 'Accessories', 'stock': 35, 'description': 'Durable backpack with multiple compartments', 'image': 'images/backpack.jpg'},
+    # Samsung Galaxy Note Series
+    {'name': 'Samsung Galaxy Note 20 Ultra', 'price': 89999, 'digital': False, 'category': 'Smartphones', 'stock': 12, 'description': 'Premium Note with S Pen and productivity features'},
     
-    # Home & Kitchen
-    {'name': 'Coffee Mug', 'price': 299, 'digital': False, 'category': 'Home & Kitchen', 'stock': 100, 'description': 'Ceramic coffee mug with elegant design', 'image': 'images/coffee_mug.jpg'},
-    {'name': 'Desk Lamp', 'price': 1499, 'digital': False, 'category': 'Home & Kitchen', 'stock': 45, 'description': 'LED desk lamp with adjustable brightness', 'image': 'images/desk_lamp.jpg'},
-    {'name': 'Plant Pot', 'price': 399, 'digital': False, 'category': 'Home & Kitchen', 'stock': 80, 'description': 'Modern ceramic pot for indoor plants', 'image': 'images/plant_pot.jpg'},
-    
-    # Furniture
-    {'name': 'Gaming Chair', 'price': 12999, 'digital': False, 'category': 'Furniture', 'stock': 20, 'description': 'Ergonomic gaming chair with lumbar support', 'image': 'images/gaming_chair.jpg'},
-    
-    # Books & Digital
-    {'name': 'Programming Book', 'price': 499, 'digital': True, 'category': 'Books', 'stock': 999, 'description': 'Complete guide to modern programming', 'image': 'images/book.jpg'},
-    {'name': 'Source Code Package', 'price': 1999, 'digital': True, 'category': 'Digital', 'stock': 999, 'description': 'Premium source code templates and projects', 'image': 'images/source_code.jpg'},
+    # Samsung Galaxy A Series
+    {'name': 'Samsung Galaxy A54', 'price': 38999, 'digital': False, 'category': 'Smartphones', 'stock': 40, 'description': 'Mid-range Galaxy with great camera and battery life'},
+    {'name': 'Samsung Galaxy A34', 'price': 30999, 'digital': False, 'category': 'Smartphones', 'stock': 35, 'description': 'Mid-range Galaxy with great value'},
+    {'name': 'Samsung Galaxy A24', 'price': 23999, 'digital': False, 'category': 'Smartphones', 'stock': 40, 'description': 'Affordable Galaxy with solid performance'},
+    {'name': 'Samsung Galaxy A14', 'price': 16999, 'digital': False, 'category': 'Smartphones', 'stock': 45, 'description': 'Budget-friendly Galaxy smartphone'},
 ]
 
 def populate():

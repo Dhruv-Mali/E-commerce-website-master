@@ -75,7 +75,7 @@ class Order(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True)
     date_ordered = models.DateTimeField(auto_now_add=True)
     complete = models.BooleanField(default=False, null=True, blank=True)
-    transaction_id = models.CharField(max_length=300, null=True, blank=True, unique=True, db_index=True)
+    transaction_id = models.CharField(max_length=255, null=True, blank=True, unique=True, db_index=True)
     stripe_payment_intent = models.CharField(max_length=300, null=True, blank=True)
     status = models.CharField(max_length=50, default='pending', choices=[
         ('pending', 'Pending'),
@@ -120,6 +120,13 @@ class Order(models.Model):
             models.Index(fields=['-date_ordered']),
             models.Index(fields=['customer', '-date_ordered']),
         ]
+        constraints = [
+            models.UniqueConstraint(
+                fields=['customer'],
+                condition=models.Q(complete=False),
+                name='unique_incomplete_order_per_customer'
+            )
+        ]
     
 class OrderItem(models.Model):
     product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
@@ -141,10 +148,10 @@ class OrderItem(models.Model):
 class ShippingAddress(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True)
     order = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True)
-    address = models.CharField(max_length=300, null=True)
-    city = models.CharField(max_length=300, null=True)
-    state = models.CharField(max_length=300, null=True)
-    zipcode = models.CharField(max_length=300, null=True)
+    address = models.CharField(max_length=255, null=True)
+    city = models.CharField(max_length=100, null=True)
+    state = models.CharField(max_length=100, null=True)
+    zipcode = models.CharField(max_length=20, null=True)
 
     date_added = models.DateTimeField(auto_now_add=True)
 

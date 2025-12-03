@@ -4,86 +4,111 @@
 {% block content %}
 
 <div class="row">
-    <!-- ----------------left----------------- -->
-    <div class="col-sm-6 mb-3 mb-sm-0">
+    <!-- Left Side - Form -->
+    <div class="col-lg-6 mb-4">
         <div class="card custom-shadow">
-            <div id="form-wrapper" class="card-body">
-                <form id="form" action="" method="POST">
+            <div class="card-body">
+                <h3 class="mb-4">Checkout Information</h3>
+                
+                {% if messages %}
+                    {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    {% endfor %}
+                {% endif %}
+
+                <form id="checkout-form" method="POST" action="">
                     {% csrf_token %}
+                    
                     <div id="user-info">
-                        <div class="form-field">
-                            <input type="text" class="form-control" name="name" placeholder="Name" required>
+                        <h5>Contact Information</h5>
+                        <div class="mb-3">
+                            <input type="text" class="form-control" name="name" placeholder="Full Name" required>
                         </div>
-                        <div class="form-field">
-                            <input type="email" class="form-control" name="email" placeholder="Email" required>
+                        <div class="mb-3">
+                            <input type="email" class="form-control" name="email" placeholder="Email Address" required>
                         </div>
                     </div>
 
-                    
                     <div id="shipping-info">
                         <hr>
-                        <h3>Shipping Information:</h3>
-                        <hr>
-                        <div class="form-field">
-                            <input type="text" class="form-control" name="address" placeholder="Address" required>
+                        <h5>Shipping Address</h5>
+                        <div class="mb-3">
+                            <input type="text" class="form-control" name="address" placeholder="Street Address" required>
                         </div>
-                        <div class="form-field">
-                            <input type="text" class="form-control" name="city" placeholder="City" required>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <input type="text" class="form-control" name="city" placeholder="City" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <input type="text" class="form-control" name="state" placeholder="State" required>
+                            </div>
                         </div>
-                        <div class="form-field">
-                            <input type="text" class="form-control" name="state" placeholder="State" required>
-                        </div>
-                        <div class="form-field">
-                            <input type="text" class="form-control" name="zipcode" placeholder="Zipcode" required>
+                        <div class="mb-3">
+                            <input type="text" class="form-control" name="zipcode" placeholder="Postal Code" required>
                         </div>
                     </div>
-                    <br>
-                    <input type="submit" id="form-btn" class="btn btn-outline-success" value="Continue" />
-                </form>
-            </div>
-        </div>
 
-        <br>
-        <div class="card custom-shadow">
-            <div id="payment-info" class="card-body hidden">
-                <p>Payment options</p>
-                <form method="POST" action="">
-                    {% csrf_token %}
-                    <button type="submit" name="make-payment-btn" id="make-payment" value="make-payment-btn">Make Payment</button>
+                    <hr>
+                    <button type="submit" name="make-payment-btn" value="make-payment-btn" class="btn btn-success btn-lg w-100">
+                        <i class="bi bi-lock-fill"></i> Proceed to Payment
+                    </button>
                 </form>
             </div>
         </div>
     </div>
     
-    <!-- ----------------right----------------- -->
-    <div class="col-sm-6">
+    <!-- Right Side - Order Summary -->
+    <div class="col-lg-6">
         <div class="card border-0 custom-shadow">
             <div class="card-body">
-                <a href="{% url 'cart' %}" class="btn btn-outline-secondary"><img
-                        src="{% static 'images/arrow-left.svg' %}" /> Back to cart</a>
+                <a href="{% url 'cart' %}" class="btn btn-outline-secondary mb-3">
+                    <img src="{% static 'images/arrow-left.svg' %}" /> Back to Cart
+                </a>
                 <hr>
-                <h2>Order summary</h2>
+                <h3 class="mb-4">Order Summary</h3>
+
+                {% if items %}
+                <div class="order-items mb-4">
+                    {% for item in items %}
+                    <div class="d-flex align-items-center mb-3 pb-3 border-bottom">
+                        <img src="{{item.product.imageURL}}" alt="{{item.product.name}}" class="rounded" style="width: 80px; height: 80px; object-fit: cover;">
+                        <div class="ms-3 flex-grow-1">
+                            <h6 class="mb-1">{{item.product.name}}</h6>
+                            <small class="text-muted">Quantity: {{item.quantity}}</small>
+                        </div>
+                        <div class="text-end">
+                            <strong>₹{{item.get_total|floatformat:0}}</strong>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
                 <hr>
-
-                <table class="table table-borderless">
-
-                    <tbody>
-                        {% for item in items %}
-                        <tr>
-                            <th scope="row"><img src="{{item.product.imageURL}}" alt="..." height="70" /></th>
-                            <td></td>
-                            <td>{{item.product.name}}</td>
-                            <td><img src="{% static 'images/rupee.svg' %}" /> {{item.product.price|floatformat:2}}</td>
-                            <td>x{{item.quantity}}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Subtotal ({{order.get_cart_items}} items):</span>
+                    <strong>₹{{order.get_cart_total|floatformat:0}}</strong>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Shipping:</span>
+                    <strong>{% if order.shipping %}₹50{% else %}FREE{% endif %}</strong>
+                </div>
                 <hr>
-                <div><strong>Items: {{order.get_cart_items}}</strong></div>
-                <div><strong>Total: <img src="{% static 'images/rupee.svg' %}" /> {{order.get_cart_total|floatformat:2}}</strong></div>
+                <div class="d-flex justify-content-between mb-3">
+                    <h5>Total:</h5>
+                    <h5 class="text-success">₹{% if order.shipping %}{{order.get_cart_total|add:50|floatformat:0}}{% else %}{{order.get_cart_total|floatformat:0}}{% endif %}</h5>
+                </div>
 
+                <div class="alert alert-info">
+                    <small><i class="bi bi-shield-check"></i> Secure payment powered by Stripe</small>
+                </div>
+                {% else %}
+                <div class="alert alert-warning">
+                    Your cart is empty. <a href="{% url 'store' %}">Continue shopping</a>
+                </div>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -91,88 +116,25 @@
 
 <script>
     var shipping = '{{order.shipping}}';
-    var total = '{{order.get_cart_total}}';
+    var user = '{{request.user}}';
 
-    {% comment %} if(shipping == 'False') {
-        console.log("Shipping is False")
-        document.getElementById("shipping-info").innerHTML = '';
-    } {% endcomment %}
-
-    var formId = document.getElementById('form');
-
-    formId.addEventListener('submit', function(e) {
-        e.preventDefault();
-        console.log("Form Submitted...");
-        document.getElementById('form-btn').classList.add('hidden');
-        document.getElementById('payment-info').classList.remove('hidden');
-    })
-
-
+    // Pre-fill user info if logged in
     if(user != 'AnonymousUser') {
-        document.getElementById('user-info').innerHTML = '';
+        document.querySelector('input[name="name"]').value = '{{request.user.username}}';
+        document.querySelector('input[name="email"]').value = '{{request.user.email}}';
     }
 
-    if(shipping == 'False' && user != 'AnonymousUser') {
-        document.getElementById('form-wrapper').classList.add('hidden');
-        document.getElementById('payment-info').classList.remove('hidden');
-    }
-
-
-    document.getElementById('make-payment').addEventListener('click', function(e) {
-        submitFormData();
-    })
-
-    function submitFormData() {
-        console.log("Payment button clicked");
-
-        var userFormData = {
-            'name': null,
-            'email': null,
-            'total': total,
-        }
-
-        var shippingInfo = {
-            'address': null,
-            'city': null,
-            'state': null,
-            'zipcode': null,
-        }
-
-        if(shipping != 'False') {
-            shippingInfo.address = formId.address.value
-            shippingInfo.city = formId.city.value
-            shippingInfo.state = formId.state.value
-            shippingInfo.zipcode = formId.zipcode.value
-        }
-
-        if(user == 'AnonymousUser') {
-            userFormData.name = formId.name.value
-            userFormData.email = formId.email.value
-        }
-
-        var url = '/process-order/';
-
-        fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': csrftoken,
-            },
-            body: JSON.stringify({'form': userFormData, 'shipping': shippingInfo})
-        })
-        .then((response) => {
-            return response.json()
-        })
-        .then((data) => {
-            console.log('Success:', data);
-            // alert("Transaction complete");
-
-            cart = {};
-            document.cookie = 'cart=' + JSON.stringify(cart) + ";domain=;path=/"
-
-            // window.location.href = "{% url 'store' %}"
-        })
+    // Hide shipping info for digital products
+    if(shipping == 'False') {
+        document.getElementById('shipping-info').style.display = 'none';
     }
 </script>
+
+<style>
+.order-items {
+    max-height: 400px;
+    overflow-y: auto;
+}
+</style>
 
 {% endblock content %}
