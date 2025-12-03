@@ -3,51 +3,51 @@
 
 {% block content %}
 
-<div class="container py-5">
+<div class="success-container py-4 py-md-5">
     <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card border-0 shadow-lg">
-                <div class="card-body text-center p-5">
-                    <div class="mb-4">
-                        <div class="rounded-circle bg-success d-inline-flex align-items-center justify-content-center" style="width: 100px; height: 100px;">
+        <div class="col-12 col-md-10 col-lg-8">
+            <div class="card border-0 shadow-lg success-card">
+                <div class="card-body text-center success-body">
+                    <div class="mb-3 mb-md-4">
+                        <div class="success-icon">
                             <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" fill="white" class="bi bi-check-lg" viewBox="0 0 16 16">
                                 <path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425a.247.247 0 0 1 .02-.022Z"/>
                             </svg>
                         </div>
                     </div>
                     
-                    <h1 class="display-5 fw-bold text-success mb-3">Order Placed Successfully!</h1>
-                    <p class="lead text-muted mb-4">Thank you for your purchase. Your order has been confirmed.</p>
+                    <h1 class="success-title mb-3">Order Placed Successfully!</h1>
+                    <p class="success-subtitle mb-3 mb-md-4">Thank you for your purchase. Your order has been confirmed.</p>
                     
                     {% if order %}
-                    <div class="bg-light rounded p-4 mb-4">
-                        <div class="row text-start">
-                            <div class="col-md-6 mb-3">
-                                <small class="text-muted">Order ID</small>
-                                <p class="fw-bold mb-0">{{order.transaction_id}}</p>
+                    <div class="order-details-box mb-3 mb-md-4">
+                        <div class="row text-start g-2 g-md-3">
+                            <div class="col-6 col-md-6">
+                                <small class="detail-label">Order ID</small>
+                                <p class="detail-value">{{order.transaction_id|slice:":12"}}</p>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <small class="text-muted">Order Total</small>
-                                <p class="fw-bold mb-0">₹{{order.get_cart_total|floatformat:0}}</p>
+                            <div class="col-6 col-md-6">
+                                <small class="detail-label">Order Total</small>
+                                <p class="detail-value">₹{{order.get_cart_total|floatformat:0}}</p>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <small class="text-muted">Items</small>
-                                <p class="fw-bold mb-0">{{order.get_cart_items}}</p>
+                            <div class="col-6 col-md-6">
+                                <small class="detail-label">Items</small>
+                                <p class="detail-value">{{order.get_cart_items}}</p>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <small class="text-muted">Status</small>
-                                <p class="fw-bold mb-0 text-success">{{order.status|title}}</p>
+                            <div class="col-6 col-md-6">
+                                <small class="detail-label">Status</small>
+                                <p class="detail-value text-success">{{order.status|title}}</p>
                             </div>
                         </div>
                     </div>
                     {% endif %}
                     
-                    <p class="mb-4">A confirmation email has been sent to your email address.</p>
+                    <p class="email-notice mb-3 mb-md-4">A confirmation email has been sent to your email address.</p>
                     
-                    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-                        <a href="{% url 'store' %}" class="btn btn-primary btn-lg px-4">Continue Shopping</a>
+                    <div class="action-buttons">
+                        <a href="{% url 'store' %}" class="btn btn-primary btn-action">Continue Shopping</a>
                         {% if request.user.is_authenticated %}
-                        <a href="{% url 'order-history' %}" class="btn btn-outline-secondary btn-lg px-4">View Orders</a>
+                        <a href="{% url 'order-history' %}" class="btn btn-outline-secondary btn-action">View Orders</a>
                         {% endif %}
                     </div>
                 </div>
@@ -55,5 +55,216 @@
         </div>
     </div>
 </div>
+
+<script>
+// Clear cart after successful payment
+document.addEventListener('DOMContentLoaded', function() {
+    // Clear cart cookie for guest users
+    document.cookie = 'cart={}; path=/; max-age=0';
+    
+    // Update cart badge to 0
+    var cartBadge = document.getElementById('cart-total');
+    if(cartBadge) {
+        cartBadge.textContent = '0';
+    }
+    
+    // Clear any cart data from localStorage
+    if(typeof(Storage) !== "undefined") {
+        localStorage.removeItem('cart');
+    }
+});
+</script>
+
+<style>
+.success-container {
+    min-height: 60vh;
+}
+
+.success-card {
+    background: linear-gradient(135deg, #1a1a1a 0%, #0D0D0D 100%);
+    border: 1px solid rgba(123,97,255,0.3);
+    border-radius: 15px;
+}
+
+.success-body {
+    padding: 2rem 1.5rem;
+}
+
+.success-icon {
+    width: 100px;
+    height: 100px;
+    background: linear-gradient(135deg, #00C2FF 0%, #7B61FF 100%);
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 30px rgba(0,194,255,0.4);
+}
+
+.success-title {
+    color: #00C2FF;
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.success-subtitle {
+    color: #A196FF;
+    font-size: 1.1rem;
+}
+
+.order-details-box {
+    background: rgba(123,97,255,0.1);
+    border: 1px solid rgba(123,97,255,0.3);
+    border-radius: 12px;
+    padding: 1.5rem;
+}
+
+.detail-label {
+    color: #A196FF;
+    font-size: 0.85rem;
+    display: block;
+    margin-bottom: 0.25rem;
+}
+
+.detail-value {
+    color: #EDEDED;
+    font-weight: 700;
+    font-size: 1rem;
+    margin-bottom: 0;
+    word-break: break-all;
+}
+
+.email-notice {
+    color: #EDEDED;
+    font-size: 0.95rem;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.btn-action {
+    padding: 0.75rem 2rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 8px;
+}
+
+/* Tablet Responsive */
+@media (max-width: 991px) {
+    .success-body {
+        padding: 1.75rem 1.25rem;
+    }
+    
+    .success-title {
+        font-size: 1.75rem;
+    }
+    
+    .success-subtitle {
+        font-size: 1rem;
+    }
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .success-container {
+        padding: 1.5rem 0;
+    }
+    
+    .success-body {
+        padding: 1.5rem 1rem;
+    }
+    
+    .success-icon {
+        width: 80px;
+        height: 80px;
+    }
+    
+    .success-icon svg {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .success-title {
+        font-size: 1.5rem;
+    }
+    
+    .success-subtitle {
+        font-size: 0.95rem;
+    }
+    
+    .order-details-box {
+        padding: 1rem;
+    }
+    
+    .detail-label {
+        font-size: 0.75rem;
+    }
+    
+    .detail-value {
+        font-size: 0.9rem;
+    }
+    
+    .email-notice {
+        font-size: 0.85rem;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    
+    .btn-action {
+        width: 100%;
+        padding: 0.65rem 1.5rem;
+        font-size: 0.95rem;
+    }
+}
+
+/* Small Mobile */
+@media (max-width: 576px) {
+    .success-body {
+        padding: 1.25rem 0.75rem;
+    }
+    
+    .success-icon {
+        width: 70px;
+        height: 70px;
+    }
+    
+    .success-icon svg {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .success-title {
+        font-size: 1.25rem;
+    }
+    
+    .success-subtitle {
+        font-size: 0.85rem;
+    }
+    
+    .order-details-box {
+        padding: 0.75rem;
+    }
+    
+    .detail-label {
+        font-size: 0.7rem;
+    }
+    
+    .detail-value {
+        font-size: 0.85rem;
+    }
+    
+    .btn-action {
+        padding: 0.6rem 1.25rem;
+        font-size: 0.9rem;
+    }
+}
+</style>
 
 {% endblock content %}

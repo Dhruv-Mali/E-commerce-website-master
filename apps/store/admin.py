@@ -41,6 +41,15 @@ class ProductAdmin(admin.ModelAdmin):
         })
     )
     list_per_page = 20
+    
+    class Media:
+        js = (
+            'https://cdn.ckeditor.com/4.25.1-lts/standard/ckeditor.js',
+            'admin/js/product_editor.js',
+        )
+        css = {
+            'all': ('admin/css/product_admin.css',)
+        }
 
 class OrderItemInline(admin.TabularInline):
     model = OrderItem
@@ -50,12 +59,12 @@ class OrderItemInline(admin.TabularInline):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ['id', 'customer', 'date_ordered', 'status', 'complete', 'get_cart_total']
+    list_display = ['transaction_id', 'customer', 'date_ordered', 'status', 'complete', 'get_cart_total', 'payment_verified']
     list_filter = ['complete', 'status', 'date_ordered']
-    search_fields = ['transaction_id', 'customer__name']
-    readonly_fields = ['date_ordered', 'get_cart_total', 'get_cart_items']
+    search_fields = ['transaction_id', 'customer__name', 'customer__email']
+    readonly_fields = ['date_ordered', 'get_cart_total', 'get_cart_items', 'transaction_id', 'stripe_payment_intent']
     inlines = [OrderItemInline]
-    actions = ['confirm_order', 'mark_processing', 'mark_shipped', 'mark_delivered']
+    actions = ['mark_processing', 'mark_shipped', 'mark_delivered']
     fieldsets = (
         ('Order Details', {
             'fields': ('customer', 'complete', 'status')
@@ -70,11 +79,17 @@ class OrderAdmin(admin.ModelAdmin):
     )
     list_per_page = 25
     
-    def confirm_order(self, request, queryset):
-        updated = queryset.update(complete=True, status='processing')
-        self.message_user(request, f'{updated} order(s) confirmed and marked as processing.')
-    confirm_order.short_description = 'Confirm selected orders'
+    def get_queryset(self, request):
+        # ONLY show completed orders with successful payment in admin
+        qs = super().get_queryset(request)
+        return qs.filter(complete=True, stripe_payment_intent__isnull=False)
     
+    def payment_verified(self, obj):
+        return obj.stripe_payment_intent is not None
+    payment_verified.boolean = True
+    payment_verified.short_description = 'Payment Verified'
+    
+
     def mark_processing(self, request, queryset):
         updated = queryset.update(status='processing')
         self.message_user(request, f'{updated} order(s) marked as processing.')

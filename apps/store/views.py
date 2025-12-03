@@ -102,17 +102,21 @@ def admin_delete_product(request, product_id):
 
 @staff_member_required
 def admin_orders(request):
-    orders = Order.objects.filter(complete=True).order_by('-date_ordered')
+    # ONLY show completed orders (paid orders)
+    orders = Order.objects.filter(
+        complete=True,
+        stripe_payment_intent__isnull=False
+    ).order_by('-date_ordered')
     
     if request.method == 'POST':
         # Handle order status updates
         order_id = request.POST.get('order_id')
         new_status = request.POST.get('status')
         if order_id and new_status:
-            order = get_object_or_404(Order, id=order_id)
+            order = get_object_or_404(Order, id=order_id, complete=True)
             order.status = new_status
             order.save()
-            messages.success(request, f'Order #{order.id} status updated to {new_status}!')
+            messages.success(request, f'Order #{order.transaction_id} status updated to {new_status}!')
             return redirect('admin_orders')
     
     context = {'orders': orders}
@@ -204,14 +208,40 @@ def checkout(request):
                 order_id = order.id
                 total_amount = order.get_cart_total
             else:
-                order_id = f"guest_{random.randint(1000, 9999)}"
-                total_amount = order['get_cart_total']
+                # Create guest customer and order before payment
+                guest_email = request.POST.get('email', '')
+                guest_name = request.POST.get('name', '')
+                
+                if not guest_email:
+                    messages.error(request, 'Email is required for checkout.')
+                    return render(request, 'store/checkout.html', {'items': items, 'order': order})
+                
+                customer, created = Customer.objects.get_or_create(
+                    email=guest_email,
+                    user=None,
+                    defaults={'name': guest_name}
+                )
+                
+                # Create order for guest
+                order_obj = Order.objects.create(customer=customer, complete=False)
+                
+                # Add items from cookie cart to order
+                for item in items:
+                    product = Product.objects.get(id=item['product']['id'])
+                    OrderItem.objects.create(
+                        product=product,
+                        order=order_obj,
+                        quantity=item['quantity']
+                    )
+                
+                order_id = order_obj.id
+                total_amount = order_obj.get_cart_total
             
-            stripe_url = product_sales_pipeline(order_id, int(total_amount * 100))
+            stripe_url = product_sales_pipeline(order_id, int(total_amount * 100), request)
             
             if stripe_url:
                 # Store order data in session for processing after payment
-                request.session['pending_order_id'] = order_id if request.user.is_authenticated else None
+                request.session['pending_order_id'] = order_id
                 request.session['order_data'] = {
                     'name': request.POST.get('name', ''),
                     'email': request.POST.get('email', ''),
@@ -261,7 +291,12 @@ def order_history(request):
         user=request.user,
         defaults={'name': request.user.username, 'email': request.user.email}
     )
-    orders = Order.objects.filter(customer=customer, complete=True).order_by('-date_ordered')
+    # ONLY show completed orders with successful payment
+    orders = Order.objects.filter(
+        customer=customer,
+        complete=True,
+        stripe_payment_intent__isnull=False
+    ).order_by('-date_ordered')
     
     # Clean up any order items with deleted products
     for order in orders:
@@ -276,59 +311,88 @@ def payment_cancelled(request):
 
 def payment_success(request):
     session_id = request.GET.get('session_id')
-    order = None
     
-    if session_id and request.user.is_authenticated:
-        try:
-            with transaction.atomic():
-                customer = Customer.objects.get(user=request.user)
-                order = Order.objects.filter(customer=customer, complete=False).first()
-                
-                if order:
-                    # Get order data from session
-                    order_data = request.session.get('order_data', {})
-                    
-                    # Complete the order
-                    order.transaction_id = Order.generate_transaction_id()
-                    order.stripe_payment_intent = session_id
-                    order.complete = True
-                    order.status = 'processing'
-                    order.save()
-                    
-                    # Reduce stock
-                    for item in order.orderitem_set.all():
-                        if item.product:
-                            item.product.reduce_stock(item.quantity)
-                    
-                    # Save shipping address if provided
-                    if order_data.get('address'):
-                        ShippingAddress.objects.create(
-                            customer=customer,
-                            order=order,
-                            address=order_data.get('address', ''),
-                            city=order_data.get('city', ''),
-                            state=order_data.get('state', ''),
-                            zipcode=order_data.get('zipcode', '')
-                        )
-                    
-                    # Send confirmation email
-                    if customer.email:
-                        send_order_confirmation_email(customer.email, order)
-                    
-                    # Clear session data
-                    request.session.pop('pending_order_id', None)
-                    request.session.pop('order_data', None)
-                    
-                    messages.success(request, f'Payment successful! Order #{order.transaction_id} has been placed.')
-                    return render(request, 'store/order_success.html', {'order': order})
-                else:
-                    messages.info(request, 'Payment received but order not found.')
-        except Exception as e:
-            messages.error(request, f'Error processing order: {str(e)}')
-    else:
-        messages.success(request, 'Payment successful!')
+    if not session_id:
+        messages.error(request, 'Invalid payment session.')
+        return redirect('store')
     
-    return redirect('store')
+    try:
+        # Verify payment with Stripe
+        stripe_session = stripe.checkout.Session.retrieve(session_id)
+        
+        if stripe_session.payment_status != 'paid':
+            messages.error(request, 'Payment verification failed.')
+            return redirect('checkout')
+        
+        # Get pending order from session
+        pending_order_id = request.session.get('pending_order_id')
+        
+        if not pending_order_id:
+            messages.warning(request, 'Order session expired. Please contact support if payment was deducted.')
+            return redirect('store')
+        
+        with transaction.atomic():
+            order = Order.objects.filter(id=pending_order_id, complete=False).first()
+            
+            if not order:
+                messages.warning(request, 'Order not found. Please contact support if payment was deducted.')
+                return redirect('store')
+            
+            # Get order data from session
+            order_data = request.session.get('order_data', {})
+            
+            # Mark order as complete
+            order.transaction_id = Order.generate_transaction_id()
+            order.stripe_payment_intent = session_id
+            order.complete = True
+            order.status = 'processing'
+            order.save()
+            
+            # Reduce stock
+            for item in order.orderitem_set.all():
+                if item.product:
+                    try:
+                        item.product.reduce_stock(item.quantity)
+                    except Exception as e:
+                        pass  # Continue even if stock update fails
+            
+            # Save shipping address
+            if order_data.get('address'):
+                try:
+                    ShippingAddress.objects.create(
+                        customer=order.customer,
+                        order=order,
+                        address=order_data.get('address', ''),
+                        city=order_data.get('city', ''),
+                        state=order_data.get('state', ''),
+                        zipcode=order_data.get('zipcode', '')
+                    )
+                except Exception as e:
+                    pass  # Continue even if shipping save fails
+            
+            # Send confirmation email
+            if order.customer.email:
+                try:
+                    send_order_confirmation_email(order.customer.email, order)
+                except Exception as e:
+                    pass  # Continue even if email fails
+            
+            # Clear session data
+            request.session.pop('pending_order_id', None)
+            request.session.pop('order_data', None)
+            
+            # Clear cart cookie
+            response = render(request, 'store/order_success.html', {'order': order})
+            response.set_cookie('cart', '{}', max_age=0)
+            
+            return response
+            
+    except stripe.error.StripeError as e:
+        messages.error(request, f'Payment verification error: {str(e)}')
+        return redirect('store')
+    except Exception as e:
+        messages.error(request, f'Error processing order: {str(e)}')
+        return redirect('store')
 
 @require_POST
 def updateItem(request):

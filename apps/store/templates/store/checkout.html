@@ -3,12 +3,12 @@
 
 {% block content %}
 
-<div class="row">
+<div class="row checkout-row g-3 g-md-4">
     <!-- Left Side - Form -->
-    <div class="col-lg-6 mb-4">
-        <div class="card custom-shadow">
-            <div class="card-body">
-                <h3 class="mb-4">Checkout Information</h3>
+    <div class="col-lg-6 col-12 mb-3 mb-lg-4">
+        <div class="card custom-shadow checkout-card">
+            <div class="card-body checkout-form-body">
+                <h3 class="mb-3 mb-md-4 checkout-title">Checkout Information</h3>
                 
                 {% if messages %}
                     {% for message in messages %}
@@ -23,36 +23,36 @@
                     {% csrf_token %}
                     
                     <div id="user-info">
-                        <h5>Contact Information</h5>
+                        <h5 class="checkout-section-title">Contact Information</h5>
                         <div class="mb-3">
-                            <input type="text" class="form-control" name="name" placeholder="Full Name" required>
+                            <input type="text" class="form-control checkout-input" name="name" placeholder="Full Name" required>
                         </div>
                         <div class="mb-3">
-                            <input type="email" class="form-control" name="email" placeholder="Email Address" required>
+                            <input type="email" class="form-control checkout-input" name="email" placeholder="Email Address" required>
                         </div>
                     </div>
 
                     <div id="shipping-info">
                         <hr>
-                        <h5>Shipping Address</h5>
+                        <h5 class="checkout-section-title">Shipping Address</h5>
                         <div class="mb-3">
-                            <input type="text" class="form-control" name="address" placeholder="Street Address" required>
+                            <input type="text" class="form-control checkout-input" name="address" placeholder="Street Address" required>
                         </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <input type="text" class="form-control" name="city" placeholder="City" required>
+                        <div class="row g-2 g-md-3">
+                            <div class="col-md-6 col-12 mb-3">
+                                <input type="text" class="form-control checkout-input" name="city" placeholder="City" required>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <input type="text" class="form-control" name="state" placeholder="State" required>
+                            <div class="col-md-6 col-12 mb-3">
+                                <input type="text" class="form-control checkout-input" name="state" placeholder="State" required>
                             </div>
                         </div>
                         <div class="mb-3">
-                            <input type="text" class="form-control" name="zipcode" placeholder="Postal Code" required>
+                            <input type="text" class="form-control checkout-input" name="zipcode" placeholder="Postal Code" required>
                         </div>
                     </div>
 
                     <hr>
-                    <button type="submit" name="make-payment-btn" value="make-payment-btn" class="btn btn-success btn-lg w-100">
+                    <button type="submit" name="make-payment-btn" value="make-payment-btn" class="btn btn-success btn-payment w-100">
                         <i class="bi bi-lock-fill"></i> Proceed to Payment
                     </button>
                 </form>
@@ -61,47 +61,47 @@
     </div>
     
     <!-- Right Side - Order Summary -->
-    <div class="col-lg-6">
-        <div class="card border-0 custom-shadow">
-            <div class="card-body">
-                <a href="{% url 'cart' %}" class="btn btn-outline-secondary mb-3">
-                    <img src="{% static 'images/arrow-left.svg' %}" /> Back to Cart
+    <div class="col-lg-6 col-12">
+        <div class="card border-0 custom-shadow checkout-card">
+            <div class="card-body checkout-summary-body">
+                <a href="{% url 'cart' %}" class="btn btn-outline-secondary btn-sm mb-3 back-btn">
+                    <img src="{% static 'images/arrow-left.svg' %}" style="width: 14px;"/> Back to Cart
                 </a>
                 <hr>
-                <h3 class="mb-4">Order Summary</h3>
+                <h3 class="mb-3 mb-md-4 checkout-title">Order Summary</h3>
 
                 {% if items %}
-                <div class="order-items mb-4">
+                <div class="order-items mb-3 mb-md-4">
                     {% for item in items %}
-                    <div class="d-flex align-items-center mb-3 pb-3 border-bottom">
-                        <img src="{{item.product.imageURL}}" alt="{{item.product.name}}" class="rounded" style="width: 80px; height: 80px; object-fit: cover;">
-                        <div class="ms-3 flex-grow-1">
-                            <h6 class="mb-1">{{item.product.name}}</h6>
-                            <small class="text-muted">Quantity: {{item.quantity}}</small>
+                    <div class="order-item d-flex align-items-center mb-2 mb-md-3 pb-2 pb-md-3 border-bottom">
+                        <img src="{{item.product.imageURL}}" alt="{{item.product.name}}" class="rounded order-item-img">
+                        <div class="ms-2 ms-md-3 flex-grow-1 order-item-details">
+                            <h6 class="mb-1 order-item-name">{{item.product.name}}</h6>
+                            <small class="text-muted order-item-qty">Quantity: {{item.quantity}}</small>
                         </div>
                         <div class="text-end">
-                            <strong>₹{{item.get_total|floatformat:0}}</strong>
+                            <strong class="order-item-price">₹{{item.get_total|floatformat:0}}</strong>
                         </div>
                     </div>
                     {% endfor %}
                 </div>
 
                 <hr>
-                <div class="d-flex justify-content-between mb-2">
-                    <span>Subtotal ({{order.get_cart_items}} items):</span>
-                    <strong>₹{{order.get_cart_total|floatformat:0}}</strong>
+                <div class="d-flex justify-content-between mb-2 summary-row">
+                    <span class="summary-label">Subtotal ({{order.get_cart_items}} items):</span>
+                    <strong class="summary-value">₹{{order.get_cart_total|floatformat:0}}</strong>
                 </div>
-                <div class="d-flex justify-content-between mb-2">
-                    <span>Shipping:</span>
-                    <strong>{% if order.shipping %}₹50{% else %}FREE{% endif %}</strong>
+                <div class="d-flex justify-content-between mb-2 summary-row">
+                    <span class="summary-label">Shipping:</span>
+                    <strong class="summary-value">{% if order.shipping %}₹50{% else %}FREE{% endif %}</strong>
                 </div>
                 <hr>
-                <div class="d-flex justify-content-between mb-3">
-                    <h5>Total:</h5>
-                    <h5 class="text-success">₹{% if order.shipping %}{{order.get_cart_total|add:50|floatformat:0}}{% else %}{{order.get_cart_total|floatformat:0}}{% endif %}</h5>
+                <div class="d-flex justify-content-between mb-3 summary-total">
+                    <h5 class="total-label">Total:</h5>
+                    <h5 class="text-success total-value">₹{% if order.shipping %}{{order.get_cart_total|add:50|floatformat:0}}{% else %}{{order.get_cart_total|floatformat:0}}{% endif %}</h5>
                 </div>
 
-                <div class="alert alert-info">
+                <div class="alert alert-info checkout-alert">
                     <small><i class="bi bi-shield-check"></i> Secure payment powered by Stripe</small>
                 </div>
                 {% else %}
@@ -120,20 +120,251 @@
 
     // Pre-fill user info if logged in
     if(user != 'AnonymousUser') {
-        document.querySelector('input[name="name"]').value = '{{request.user.username}}';
-        document.querySelector('input[name="email"]').value = '{{request.user.email}}';
+        var nameInput = document.querySelector('input[name="name"]');
+        var emailInput = document.querySelector('input[name="email"]');
+        if(nameInput) nameInput.value = '{{request.user.username}}';
+        if(emailInput) emailInput.value = '{{request.user.email}}';
     }
 
     // Hide shipping info for digital products
     if(shipping == 'False') {
-        document.getElementById('shipping-info').style.display = 'none';
+        var shippingInfo = document.getElementById('shipping-info');
+        if(shippingInfo) shippingInfo.style.display = 'none';
     }
 </script>
 
 <style>
+.checkout-row {
+    margin: 0;
+}
+
+.checkout-card {
+    background: #1a1a1a;
+    border: 1px solid rgba(123,97,255,0.3);
+}
+
+.checkout-form-body,
+.checkout-summary-body {
+    padding: 1.5rem;
+}
+
+.checkout-title {
+    color: #EDEDED;
+    font-size: 1.5rem;
+}
+
+.checkout-section-title {
+    color: #A196FF;
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+}
+
+.checkout-input {
+    background: #0D0D0D;
+    border: 2px solid rgba(123,97,255,0.3);
+    color: #EDEDED;
+    padding: 0.75rem;
+    font-size: 1rem;
+}
+
+.checkout-input:focus {
+    background: #0D0D0D;
+    border-color: #7B61FF;
+    color: #EDEDED;
+    box-shadow: 0 0 0 0.2rem rgba(123,97,255,0.25);
+}
+
+.btn-payment {
+    padding: 0.85rem 1.5rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    background: linear-gradient(135deg, #00C2FF 0%, #7B61FF 100%);
+    border: none;
+}
+
+.btn-payment:hover {
+    background: linear-gradient(135deg, #7B61FF 0%, #00C2FF 100%);
+}
+
 .order-items {
     max-height: 400px;
     overflow-y: auto;
+}
+
+.order-item-img {
+    width: 70px;
+    height: 70px;
+    object-fit: cover;
+}
+
+.order-item-name {
+    color: #EDEDED;
+    font-size: 1rem;
+}
+
+.order-item-qty {
+    font-size: 0.85rem;
+}
+
+.order-item-price {
+    color: #EDEDED;
+    font-size: 1rem;
+}
+
+.summary-label,
+.summary-value {
+    font-size: 0.95rem;
+}
+
+.total-label,
+.total-value {
+    font-size: 1.25rem;
+}
+
+.checkout-alert {
+    background: rgba(123,97,255,0.1);
+    border-color: #7B61FF;
+    color: #EDEDED;
+}
+
+/* Tablet Responsive */
+@media (max-width: 992px) {
+    .checkout-title {
+        font-size: 1.35rem;
+    }
+    
+    .checkout-section-title {
+        font-size: 1rem;
+    }
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .checkout-row {
+        margin: 0 -0.5rem;
+    }
+    
+    .checkout-form-body,
+    .checkout-summary-body {
+        padding: 1rem;
+    }
+    
+    .checkout-title {
+        font-size: 1.25rem;
+    }
+    
+    .checkout-section-title {
+        font-size: 0.95rem;
+        margin-bottom: 0.75rem;
+    }
+    
+    .checkout-input {
+        padding: 0.65rem;
+        font-size: 0.9rem;
+    }
+    
+    .btn-payment {
+        padding: 0.75rem 1.25rem;
+        font-size: 1rem;
+    }
+    
+    .back-btn {
+        font-size: 0.85rem;
+        padding: 0.5rem 0.75rem;
+    }
+    
+    .order-items {
+        max-height: 280px;
+    }
+    
+    .order-item-img {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .order-item-name {
+        font-size: 0.9rem;
+    }
+    
+    .order-item-qty {
+        font-size: 0.75rem;
+    }
+    
+    .order-item-price {
+        font-size: 0.9rem;
+    }
+    
+    .summary-label,
+    .summary-value {
+        font-size: 0.85rem;
+    }
+    
+    .total-label,
+    .total-value {
+        font-size: 1.1rem;
+    }
+    
+    .checkout-alert {
+        font-size: 0.85rem;
+        padding: 0.75rem;
+    }
+}
+
+/* Small Mobile */
+@media (max-width: 576px) {
+    .checkout-form-body,
+    .checkout-summary-body {
+        padding: 0.75rem;
+    }
+    
+    .checkout-title {
+        font-size: 1.1rem;
+    }
+    
+    .checkout-section-title {
+        font-size: 0.9rem;
+    }
+    
+    .checkout-input {
+        padding: 0.6rem;
+        font-size: 0.85rem;
+    }
+    
+    .btn-payment {
+        padding: 0.7rem 1rem;
+        font-size: 0.95rem;
+    }
+    
+    .order-items {
+        max-height: 240px;
+    }
+    
+    .order-item-img {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .order-item-name {
+        font-size: 0.85rem;
+    }
+    
+    .order-item-qty {
+        font-size: 0.7rem;
+    }
+    
+    .order-item-price {
+        font-size: 0.85rem;
+    }
+    
+    .summary-label,
+    .summary-value {
+        font-size: 0.8rem;
+    }
+    
+    .total-label,
+    .total-value {
+        font-size: 1rem;
+    }
 }
 </style>
 

@@ -51,6 +51,23 @@ body {
     box-shadow: 0 5px 20px rgba(123,97,255,0.4);
 }
 
+@media (max-width: 768px) {
+    .btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+    }
+    
+    .btn-lg {
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+    }
+    
+    .btn-sm {
+        padding: 0.35rem 0.75rem;
+        font-size: 0.8rem;
+    }
+}
+
 .btn-outline-primary {
     color: var(--accent-purple);
     border-color: var(--accent-purple);
@@ -96,6 +113,16 @@ body {
 
 .card:hover {
     box-shadow: 0 8px 25px rgba(123,97,255,0.4);
+}
+
+@media (max-width: 768px) {
+    .card {
+        margin-bottom: 1rem;
+    }
+    
+    .card-body {
+        padding: 1rem;
+    }
 }
 
 .custom-shadow {
@@ -151,6 +178,17 @@ body {
     box-shadow: 0 0 0 0.2rem rgba(123,97,255,0.25);
     background: var(--bg-dark);
     color: var(--text);
+}
+
+/* Mobile Form Optimization */
+@media (max-width: 768px) {
+    .form-control, .form-select {
+        font-size: 16px;
+    }
+    
+    .input-group-lg .form-control {
+        font-size: 16px;
+    }
 }
 
 /* Search Section */
@@ -291,9 +329,50 @@ h1, h2, h3, h4, h5, h6 {
     color: var(--text);
 }
 
-/* Responsive */
+/* Mobile Responsive */
+@media (max-width: 992px) {
+    .navbar-brand {
+        font-size: 1.25rem;
+    }
+    
+    .nav-link {
+        padding: 0.5rem 1rem;
+    }
+}
+
 @media (max-width: 768px) {
     .store-header {
         padding: 2rem 0;
+    }
+    
+    .navbar-collapse {
+        background: var(--bg-dark);
+        padding: 1rem;
+        border-radius: 10px;
+        margin-top: 1rem;
+        border: 1px solid rgba(123,97,255,0.3);
+    }
+    
+    .navbar-nav {
+        gap: 0.5rem;
+    }
+    
+    .nav-item {
+        text-align: center;
+    }
+    
+    .dropdown-menu {
+        text-align: center;
+    }
+}
+
+@media (max-width: 576px) {
+    .navbar-brand {
+        font-size: 1.1rem;
+    }
+    
+    .badge {
+        font-size: 0.7rem;
+        padding: 0.25em 0.5em;
     }
 }

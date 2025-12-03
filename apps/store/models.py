@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.core.exceptions import ValidationError
+from django.utils.safestring import mark_safe
 import uuid
 
 # Import extended models for Django to recognize them

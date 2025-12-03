@@ -45,7 +45,7 @@ def cookieCart(request):
     return {'cartItems': cartItems, 'order': order, 'items': items}
 
 
-def product_sales_pipeline(product_name, product_price):
+def product_sales_pipeline(product_name, product_price, request=None):
     try:
         stripe_product_obj = stripe.Product.create(name=str(product_name))
         stripe_price_obj = stripe.Price.create(
@@ -54,7 +54,12 @@ def product_sales_pipeline(product_name, product_price):
             currency='inr'
         )
         
-        base_endpoint = 'http://127.0.0.1:8000'
+        # Get base URL from request to support any port
+        if request:
+            base_endpoint = request.build_absolute_uri('/').rstrip('/')
+        else:
+            base_endpoint = 'http://127.0.0.1:8000'
+        
         checkout_session = stripe.checkout.Session.create(
             line_items=[{'price': stripe_price_obj.id, 'quantity': 1}],
             mode='payment',

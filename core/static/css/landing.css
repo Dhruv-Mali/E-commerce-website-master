@@ -316,14 +316,36 @@
 }
 
 /* Responsive */
+@media (max-width: 992px) {
+    .display-1 {
+        font-size: 3.5rem;
+    }
+    
+    .hero-buttons {
+        justify-content: center;
+    }
+    
+    .stat-box {
+        padding: 1.5rem;
+    }
+    
+    .feature-box {
+        padding: 1.5rem;
+    }
+}
+
 @media (max-width: 768px) {
     .display-1 {
-        font-size: 3rem;
+        font-size: 2.5rem;
+    }
+    
+    .hero-section {
+        padding: 3rem 0;
     }
     
     .hero-image-wrapper {
         height: 300px;
-        margin-top: 3rem;
+        margin-top: 2rem;
     }
     
     .hero-main-image {
@@ -334,6 +356,7 @@
     
     .floating-card {
         padding: 0.5rem;
+        font-size: 0.85rem;
     }
     
     .product-emoji {
@@ -342,9 +365,110 @@
     
     .hero-stats {
         gap: 1rem;
+        justify-content: center;
     }
     
     .stat-item {
         font-size: 0.9rem;
+    }
+    
+    .stat-box {
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        font-size: 1.5rem;
+    }
+    
+    .counter {
+        font-size: 2rem;
+    }
+    
+    .feature-box {
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .feature-icon-wrapper {
+        width: 60px;
+        height: 60px;
+        font-size: 1.5rem;
+    }
+    
+    .category-card {
+        padding: 2rem;
+        margin-bottom: 1rem;
+    }
+    
+    .category-icon {
+        font-size: 3rem;
+    }
+    
+    .testimonial-card {
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .display-1 {
+        font-size: 2rem;
+    }
+    
+    .lead {
+        font-size: 1rem;
+    }
+    
+    .hero-image-wrapper {
+        height: 250px;
+    }
+    
+    .hero-main-image {
+        width: 120px;
+        height: 120px;
+        font-size: 3rem;
+    }
+    
+    .floating-card {
+        padding: 0.4rem;
+        font-size: 0.75rem;
+    }
+    
+    .product-mini h6 {
+        font-size: 0.85rem;
+    }
+    
+    .stat-item {
+        font-size: 0.8rem;
+    }
+    
+    .btn {
+        padding: 0.6rem 1.2rem;
+        font-size: 0.9rem;
+    }
+    
+    .counter {
+        font-size: 1.75rem;
+    }
+    
+    .stat-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 1.25rem;
+    }
+    
+    .category-icon {
+        font-size: 2.5rem;
+    }
+    
+    .section-header h2 {
+        font-size: 1.75rem;
+    }
+    
+    .section-header p {
+        font-size: 0.95rem;
     }
 }

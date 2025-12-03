@@ -1,26 +1,26 @@
 <!-- Footer -->
-<footer class="footer mt-5" style="background: #0D0D0D; color: #EDEDED; border-top: 2px solid #7B61FF;">
-    <div class="container py-4">
-        <div class="row align-items-center">
-            <div class="col-md-4 mb-3 mb-md-0">
-                <h5 class="fw-bold mb-2">
+<footer class="footer mt-3 mt-md-5" style="background: #0D0D0D; color: #EDEDED; border-top: 2px solid #7B61FF; overflow: hidden;">
+    <div class="container-fluid px-3 py-3 py-md-4">
+        <div class="row align-items-center g-3">
+            <div class="col-12 col-md-4 text-center text-md-start mb-2 mb-md-0">
+                <h5 class="fw-bold mb-2 footer-title">
                     <span style="color: #7B61FF;">⚡</span> TechHub
                 </h5>
-                <p class="mb-0 small">India's most trusted tech store</p>
+                <p class="mb-0 small footer-tagline">India's most trusted tech store</p>
             </div>
             
-            <div class="col-md-4 mb-3 mb-md-0 text-center">
+            <div class="col-12 col-md-4 text-center mb-2 mb-md-0">
                 <div class="social-links">
-                    <a href="#" class="text-light me-3"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#" class="text-light me-3"><i class="fab fa-twitter"></i></a>
-                    <a href="#" class="text-light me-3"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="text-light me-2 me-md-3"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="text-light me-2 me-md-3"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="text-light me-2 me-md-3"><i class="fab fa-instagram"></i></a>
                     <a href="#" class="text-light"><i class="fab fa-youtube"></i></a>
                 </div>
             </div>
             
-            <div class="col-md-4 text-md-end">
-                <a href="{% url 'store' %}" class="text-light text-decoration-none me-3 small">Store</a>
-                <a href="{% url 'cart' %}" class="text-light text-decoration-none me-3 small">Cart</a>
+            <div class="col-12 col-md-4 text-center text-md-end footer-links">
+                <a href="{% url 'store' %}" class="text-light text-decoration-none me-2 me-md-3 small">Store</a>
+                <a href="{% url 'cart' %}" class="text-light text-decoration-none me-2 me-md-3 small">Cart</a>
                 {% if request.user.is_authenticated %}
                 <a href="{% url 'order-history' %}" class="text-light text-decoration-none small">Orders</a>
                 {% else %}
@@ -29,39 +29,200 @@
             </div>
         </div>
         
-        <hr style="border-color: rgba(123,97,255,0.3); margin: 1rem 0;">
+        <hr style="border-color: rgba(123,97,255,0.3); margin: 0.75rem 0 0.75rem 0;">
         
-        <div class="row align-items-center">
-            <div class="col-md-6 text-center text-md-start">
-                <p class="mb-0 small">&copy; 2024 TechHub. All rights reserved.</p>
+        <div class="row align-items-center g-2">
+            <div class="col-12 col-md-6 text-center text-md-start mb-2 mb-md-0">
+                <p class="mb-0 small footer-copyright">&copy; 2024 TechHub. All rights reserved.</p>
             </div>
-            <div class="col-md-6 text-center text-md-end">
-                <span class="badge me-2" style="background: #7B61FF;">🔒 SSL Secured</span>
-                <span class="badge" style="background: #00C2FF; color: #0D0D0D;">💳 Safe Payments</span>
+            <div class="col-12 col-md-6 text-center text-md-end footer-badges">
+                <span class="badge me-1 me-md-2 footer-badge" style="background: #7B61FF;">🔒 SSL Secured</span>
+                <span class="badge footer-badge" style="background: #00C2FF; color: #0D0D0D;">💳 Safe Payments</span>
             </div>
         </div>
     </div>
 </footer>
 
 <style>
+.footer {
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: hidden;
+}
+
+.footer * {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
 .footer a:hover {
     color: #7B61FF !important;
     transition: color 0.3s ease;
 }
 
+.social-links {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
 .social-links a {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     width: 35px;
     height: 35px;
-    line-height: 35px;
-    text-align: center;
     border-radius: 50%;
     background: rgba(123,97,255,0.2);
     transition: all 0.3s ease;
+    flex-shrink: 0;
 }
 
 .social-links a:hover {
     background: #7B61FF;
     transform: translateY(-2px);
+}
+
+.footer-links {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.footer-badges {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+}
+
+/* Tablet Responsive */
+@media (max-width: 992px) {
+    .footer {
+        margin-top: 2rem !important;
+    }
+    
+    .container-fluid {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+    }
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .footer {
+        margin-top: 1.5rem !important;
+    }
+    
+    .container-fluid {
+        padding: 1rem 0.75rem !important;
+    }
+    
+    .footer-title {
+        font-size: 1.1rem;
+    }
+    
+    .footer-tagline {
+        font-size: 0.8rem;
+    }
+    
+    .footer-links {
+        justify-content: center !important;
+    }
+    
+    .footer-links a {
+        font-size: 0.8rem;
+        margin: 0.25rem;
+    }
+    
+    .social-links a {
+        width: 32px;
+        height: 32px;
+        font-size: 0.9rem;
+    }
+    
+    .footer-copyright {
+        font-size: 0.75rem;
+    }
+    
+    .footer-badge {
+        font-size: 0.7rem;
+        padding: 0.3rem 0.5rem;
+    }
+    
+    hr {
+        margin: 0.5rem 0 !important;
+    }
+}
+
+/* Small Mobile */
+@media (max-width: 576px) {
+    .footer {
+        margin-top: 1rem !important;
+    }
+    
+    .container-fluid {
+        padding: 0.75rem 0.5rem !important;
+    }
+    
+    .footer-title {
+        font-size: 1rem;
+    }
+    
+    .footer-tagline {
+        font-size: 0.75rem;
+    }
+    
+    .footer-links a {
+        font-size: 0.75rem;
+        margin: 0.2rem;
+    }
+    
+    .social-links {
+        gap: 0.35rem;
+    }
+    
+    .social-links a {
+        width: 28px;
+        height: 28px;
+        font-size: 0.85rem;
+    }
+    
+    .footer-copyright {
+        font-size: 0.7rem;
+    }
+    
+    .footer-badge {
+        font-size: 0.65rem;
+        padding: 0.25rem 0.4rem;
+    }
+}
+
+/* Desktop/Laptop Footer Spacing */
+@media (min-width: 992px) {
+    .footer {
+        margin-top: 4rem !important;
+    }
+}
+
+/* Prevent horizontal scroll */
+@media (max-width: 768px) {
+    body {
+        overflow-x: hidden;
+    }
+    
+    .footer .row {
+        margin-left: 0;
+        margin-right: 0;
+    }
+    
+    .footer [class*="col-"] {
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+    }
 }
 </style>
