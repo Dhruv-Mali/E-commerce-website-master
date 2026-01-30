@@ -1,19 +1,18 @@
-# 🛒 Micro E-Commerce Web Application
+# 🛒 E-Commerce Web Application
 
-A full-featured Django-based e-commerce platform that enables customers to browse products, manage shopping carts, and complete purchases with or without user registration. Integrated with Stripe for secure payment processing.
+A full-featured Django-based e-commerce platform with Docker support that enables customers to browse products, manage shopping carts, and complete purchases with or without user registration. Integrated with Stripe for secure payment processing.
 
 ---
 
 ## 📋 Table of Contents
 - [Features](#-features)
 - [Technologies Used](#-technologies-used)
-- [Project Structure](#-project-structure)
-- [Installation & Setup](#-installation--setup)
+- [Quick Start with Docker](#-quick-start-with-docker)
+- [Manual Installation](#-manual-installation)
 - [Usage](#-usage)
+- [Docker Commands](#-docker-commands)
 - [API Endpoints](#-api-endpoints)
-- [Screenshots](#-screenshots)
 - [Contributing](#-contributing)
-- [License](#-license)
 
 ---
 
@@ -61,227 +60,154 @@ A full-featured Django-based e-commerce platform that enables customers to brows
 ## 🛠 Technologies Used
 
 ### Backend
-| Technology | Version | Purpose |
-|------------|---------|---------|
-| Python | 3.12 | Programming language |
-| Django | 4.2.2 | Web framework |
-| SQLite | - | Database (development) |
-| Django ORM | - | Object-relational mapping |
-| Django Signals | - | Automatic profile creation |
+- **Python** 3.12
+- **Django** 4.2.2
+- **MySQL** 8.0 (Docker)
+- **Redis** 7 (Caching)
+- **Gunicorn** 20.1.0 (WSGI Server)
 
 ### Frontend
-| Technology | Version | Purpose |
-|------------|---------|---------|
-| HTML5 | - | Markup language |
-| CSS3 | - | Styling |
-| Bootstrap | 5 | CSS framework |
-| JavaScript | ES6 | Client-side scripting |
-| AJAX | - | Asynchronous updates |
+- **HTML5** / **CSS3**
+- **Bootstrap** 5
+- **JavaScript** ES6
+- **AJAX**
+
+### DevOps & Deployment
+- **Docker** & **Docker Compose**
+- **WhiteNoise** 6.5.0 (Static files)
+- **Nginx** (Reverse proxy)
 
 ### Payment & Integration
-| Technology | Version | Purpose |
-|------------|---------|---------|
-| Stripe API | 5.4.0 | Payment processing |
-| Stripe Checkout | - | Secure payment gateway |
-
-### Additional Libraries
-| Library | Version | Purpose |
-|---------|---------|---------|
-| WhiteNoise | 6.5.0 | Static file serving |
-| Pillow | 9.5.0 | Image processing |
-| python-dotenv | 1.0.0 | Environment variables |
-| django-cors-headers | 4.1.0 | CORS handling |
-| requests | 2.31.0 | HTTP library |
-| gunicorn | 20.1.0 | WSGI server (production) |
+- **Stripe API** 5.4.0
+- **Pillow** 10.0.0 (Image processing)
+- **python-dotenv** 1.0.0
 
 ---
 
-## 📁 Project Structure
+## 🚀 Quick Start with Docker
 
-```
-e-commerce-master/
-├── ecommerce/              # Django project settings
-│   ├── settings.py         # Configuration
-│   ├── urls.py             # Main URL routing
-│   └── wsgi.py             # WSGI configuration
-├── store/                  # Main e-commerce app
-│   ├── models.py           # Database models
-│   ├── views.py            # View functions
-│   ├── urls.py             # App URL routing
-│   ├── utils.py            # Helper functions
-│   ├── admin.py            # Admin configuration
-│   └── templates/store/    # HTML templates
-├── loginsys/               # Authentication app
-│   ├── views.py            # Login/Register views
-│   ├── forms.py            # User forms
-│   └── templates/loginsys/ # Auth templates
-├── static/                 # Static files
-│   ├── css/main.css        # Styles
-│   ├── js/cart.js          # Cart functionality
-│   └── images/             # Product images
-├── templates/              # Base templates
-│   ├── index.html
-│   └── navbar.html
-├── scripts/                # Utility scripts
-│   ├── setup_db.py         # Database setup
-│   └── populate_database.py # Sample data
-├── docs/                   # Documentation
-│   ├── README_SETUP.md
-│   ├── STRIPE_INTEGRATION_GUIDE.md
-│   └── PROJECT_STRUCTURE.md
-├── manage.py               # Django management
-├── requirements.txt        # Dependencies
-├── .env                    # Environment variables
-├── Dockerfile              # Docker configuration
-├── docker-compose.yml      # Docker Compose
-└── README.md               # Main documentation
-```
-
----
-
-## 🚀 Installation & Setup
-
-### Option 1: Docker (Recommended)
-
-#### Prerequisites
-- Docker installed on your system
-- Docker Compose (optional)
-
-#### Quick Start with Docker
-```bash
-# Clone the repository
-git clone <repository-url>
-cd e-commerce-master
-
-# Build and run with Docker Compose
-docker-compose up --build
-
-# Or build and run with Docker
-docker build -t ecommerce-app .
-docker run -p 8000:8000 ecommerce-app
-```
-
-Access the application at: **http://localhost:8000**
-
-### Option 2: Manual Installation
-
-#### Prerequisites
-- Python 3.12 or higher
-- pip (Python package manager)
+### Prerequisites
+- Docker Desktop installed and running
 - Git
 
-### Step 1: Clone the Repository
+### Steps
+
 ```bash
-git clone <repository-url>
-cd e-commerce-master
+# 1. Clone the repository
+git clone https://github.com/Dhruv-Mali/E-commerce-website-master.git
+cd E-commerce-website-master
+
+# 2. Configure environment variables
+# Copy .env.example to .env and update values
+cp .env.example .env
+
+# 3. Start Docker containers
+docker-compose up -d
+
+# 4. Access the application
+# Web: http://localhost:8000
+# MySQL: localhost:3307
+# Redis: localhost:6379
 ```
 
-### Step 2: Create Virtual Environment
+### Docker Services
+- **web** - Django application (port 8000)
+- **mysql** - MySQL database (port 3307)
+- **redis** - Redis cache (port 6379)
+
+---
+
+## 💻 Manual Installation
+
+### Prerequisites
+- Python 3.12+
+- pip
+- Git
+
+### Steps
+
 ```bash
-# Windows
+# 1. Clone repository
+git clone https://github.com/Dhruv-Mali/E-commerce-website-master.git
+cd E-commerce-website-master
+
+# 2. Create virtual environment
 python -m venv venv
-venv\Scripts\activate
+venv\Scripts\activate  # Windows
+# source venv/bin/activate  # macOS/Linux
 
-# macOS/Linux
-python3 -m venv venv
-source venv/bin/activate
-```
-
-### Step 3: Install Dependencies
-```bash
+# 3. Install dependencies
 pip install -r requirements.txt
-```
 
-### Step 4: Configure Environment Variables
-Update the `.env` file with your credentials:
-```env
-SECRET_KEY=your_django_secret_key_here
-STRIPE_PUBLIC_KEY=your_stripe_public_key_here
-STRIPE_SECRET_KEY=your_stripe_secret_key_here
-DEBUG=True
-EMAIL_HOST_USER=your_email@gmail.com
-EMAIL_HOST_PASSWORD=your_email_password
-```
+# 4. Configure .env file
+# Update with your credentials
 
-### Step 5: Set Up Database
-```bash
-python scripts/setup_db.py
-```
-This will:
-- Run migrations
-- Create database tables
-- Create superuser (admin/admin123)
+# 5. Run migrations
+python manage.py migrate
 
-### Step 6: Load Sample Data (Optional)
-```bash
-python scripts/populate_database.py
-```
-This creates sample products with categories and stock.
+# 6. Create superuser
+python manage.py createsuperuser
 
-### Step 7: Run Development Server
-```bash
+# 7. Run server
 python manage.py runserver
 ```
 
-Access the application at: **http://127.0.0.1:8000**
-
----
-
-## 🐳 Docker Commands
-
-### Build Docker Image
-```bash
-docker build -t ecommerce-app .
-```
-
-### Run Docker Container
-```bash
-docker run -p 8000:8000 ecommerce-app
-```
-
-### Using Docker Compose
-```bash
-# Start services
-docker-compose up
-
-# Start in detached mode
-docker-compose up -d
-
-# Stop services
-docker-compose down
-
-# Rebuild and start
-docker-compose up --build
-```
-
-### Access Running Container
-```bash
-docker exec -it <container_id> bash
-```
+Access at: **http://127.0.0.1:8000**
 
 ---
 
 ## 📖 Usage
 
 ### Admin Panel
-- URL: `http://127.0.0.1:8000/admin/`
-- Username: `admin`
-- Password: `admin123`
+- **URL**: http://localhost:8000/admin/
+- **Username**: admin
+- **Password**: admin123
 
 ### User Actions
-1. **Browse Products**: Visit homepage to see all products
-2. **Search Products**: Use search bar to find specific items
-3. **Filter by Category**: Select category from dropdown
-4. **View Product Details**: Click "View" button on any product
-5. **Add to Cart**: Click "Add to Cart" button
-6. **Checkout**: Navigate to cart and proceed to checkout
-7. **Payment**: Complete payment via Stripe
-8. **View Orders**: Check order history (logged-in users only)
+1. Browse products on homepage
+2. Search and filter products
+3. View product details
+4. Add items to cart
+5. Proceed to checkout
+6. Complete payment via Stripe
+7. View order history (logged-in users)
 
 ### Guest Checkout
-- Add items to cart without logging in
-- Cart stored in browser cookies
+- Add items without login
+- Cart stored in cookies
 - Complete purchase as guest
+
+---
+
+## 🐳 Docker Commands
+
+```bash
+# Start all services
+docker-compose up -d
+
+# Stop all services
+docker-compose down
+
+# View logs
+docker-compose logs -f
+
+# View specific service logs
+docker-compose logs -f web
+
+# Rebuild and start
+docker-compose up --build -d
+
+# Check running containers
+docker ps
+
+# Access web container shell
+docker exec -it ecommerce-web bash
+
+# Run Django commands in container
+docker-compose exec web python manage.py migrate
+docker-compose exec web python manage.py createsuperuser
+docker-compose exec web python manage.py collectstatic
+```
 
 ---
 
@@ -289,91 +215,115 @@ docker exec -it <container_id> bash
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | `/` | Store homepage with products |
-| GET | `/product/<id>/` | Product detail page |
-| GET | `/cart/` | Shopping cart page |
+| GET | `/` | Store homepage |
+| GET | `/product/<id>/` | Product details |
+| GET | `/cart/` | Shopping cart |
 | GET | `/checkout/` | Checkout page |
-| GET | `/orders/` | Order history (auth required) |
-| POST | `/update-item/` | Add/remove cart items (AJAX) |
-| POST | `/process-order/` | Process order completion |
-| GET | `/l/` | Login page |
-| GET | `/l/register/` | Registration page |
-| GET | `/l/logout/` | Logout user |
-
----
-
-## 📸 Screenshots
-
-### Home Page
-![Home Page](screenshots/home.png)
-
-### Cart Page
-![Cart Page](screenshots/cart.png)
-
-### Checkout Page
-![Checkout Page](screenshots/checkout.png)
-
-### Stripe Payment
-![Stripe Payment](screenshots/stripe.png)
+| GET | `/orders/` | Order history |
+| POST | `/update-item/` | Update cart (AJAX) |
+| POST | `/process-order/` | Process order |
+| GET | `/l/` | Login |
+| GET | `/l/register/` | Register |
+| GET | `/l/logout/` | Logout |
 
 ---
 
 ## 🔧 Configuration
 
-### Email Setup (Optional)
-For production, update settings.py:
-```python
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'your_email@gmail.com'
-EMAIL_HOST_PASSWORD = 'your_app_password'
-```
+### Environment Variables (.env)
+```env
+# Django
+SECRET_KEY=your-secret-key
+DEBUG=True
+ALLOWED_HOSTS=localhost,127.0.0.1
 
-### Stripe Setup
-1. Create account at [stripe.com](https://stripe.com)
-2. Get API keys from Dashboard
-3. Add keys to `.env` file
-4. Test with Stripe test cards
+# Database
+DB_NAME=ecommerce_db
+DB_USER=ecommerce_user
+DB_PASSWORD=your-password
+DB_ROOT_PASSWORD=root-password
+
+# Stripe
+STRIPE_PUBLIC_KEY=pk_test_xxx
+STRIPE_SECRET_KEY=sk_test_xxx
+
+# Email
+EMAIL_HOST_USER=your-email@gmail.com
+EMAIL_HOST_PASSWORD=your-app-password
+```
 
 ---
 
 ## 🐛 Troubleshooting
 
-### Common Issues
+### Docker Issues
 
-**Issue**: Module not found error
+**Port already in use:**
 ```bash
-Solution: pip install -r requirements.txt
+# Change port in docker-compose.yml
+ports:
+  - "8001:8000"  # Use different port
 ```
 
-**Issue**: Database errors
+**Container won't start:**
 ```bash
-Solution: python manage.py migrate
+docker-compose down
+docker-compose up --build
 ```
 
-**Issue**: Static files not loading
+**Database connection error:**
 ```bash
-Solution: python manage.py collectstatic
+# Wait for MySQL to fully start
+docker-compose logs mysql
 ```
 
-**Issue**: Port already in use
+### Application Issues
+
+**Static files not loading:**
 ```bash
-Solution: python manage.py runserver 8080
+python manage.py collectstatic
+```
+
+**Database errors:**
+```bash
+python manage.py migrate
+```
+
+---
+
+## 📁 Project Structure
+
+```
+E-commerce-website-master/
+├── apps/
+│   ├── loginsys/          # Authentication
+│   └── store/             # E-commerce logic
+├── config/
+│   └── ecommerce/         # Django settings
+├── core/
+│   ├── static/            # Static files
+│   └── templates/         # Base templates
+├── media/                 # Product images
+├── staticfiles/           # Collected static files
+├── utils/                 # Utility scripts
+├── Dockerfile             # Docker configuration
+├── docker-compose.yml     # Docker Compose config
+├── requirements.txt       # Python dependencies
+├── requirements-docker.txt # Docker-specific deps
+├── manage.py              # Django management
+├── .env                   # Environment variables
+└── README.md              # This file
 ```
 
 ---
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please follow these steps:
-
 1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
+2. Create feature branch (`git checkout -b feature/AmazingFeature`)
 3. Commit changes (`git commit -m 'Add AmazingFeature'`)
 4. Push to branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+5. Open Pull Request
 
 ---
 
@@ -383,9 +333,11 @@ This project is open source and available under the [MIT License](LICENSE).
 
 ---
 
-## 👨‍💻 Author
+## 👨💻 Author
 
-Developed with ❤️ by Dhruv Mali
+**Dhruv Mali**
+- Email: dhruvmali9039@gmail.com
+- GitHub: [@Dhruv-Mali](https://github.com/Dhruv-Mali)
 
 ---
 
@@ -394,13 +346,16 @@ Developed with ❤️ by Dhruv Mali
 - Django Documentation
 - Bootstrap Team
 - Stripe API Documentation
+- Docker Community
 - Python Community
 
 ---
 
 ## 📞 Support
 
-For support, email dhruvmali9039@gmail.com or open an issue in the repository.
+For support:
+- Email: dhruvmali9039@gmail.com
+- Open an issue in the repository
 
 ---
 
