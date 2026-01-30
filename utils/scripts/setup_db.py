@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 
 if __name__ == '__main__':
     load_dotenv()
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'ecommerce.settings')
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.ecommerce.settings')
     django.setup()
     
     # Run migrations

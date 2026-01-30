@@ -305,6 +305,11 @@ def order_history(request):
     context = {'orders': orders}
     return render(request, 'store/order_history.html', context)
 
+def wishlist(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    return render(request, 'store/wishlist.html')
+
 def payment_cancelled(request):
     messages.warning(request, 'Payment was cancelled. Your cart is still saved.')
     return redirect('checkout')

@@ -1,6 +1,21 @@
 <!-- Footer -->
 <footer class="footer mt-3 mt-md-5" style="background: #0D0D0D; color: #EDEDED; border-top: 2px solid #7B61FF; overflow: hidden;">
     <div class="container-fluid px-3 py-3 py-md-4">
+        <!-- Newsletter Subscription -->
+        <div class="row mb-4">
+            <div class="col-12 col-md-6 mx-auto">
+                <div class="text-center">
+                    <h5 class="mb-2">📧 Subscribe to Newsletter</h5>
+                    <p class="small mb-3">Get updates on new products and offers</p>
+                    <form id="newsletter-form" class="d-flex gap-2">
+                        <input type="email" id="newsletter-email" class="form-control" placeholder="Enter your email" required>
+                        <button type="submit" class="btn btn-primary">Subscribe</button>
+                    </form>
+                    <div id="newsletter-message" class="mt-2 small"></div>
+                </div>
+            </div>
+        </div>
+        
         <div class="row align-items-center g-3">
             <div class="col-12 col-md-4 text-center text-md-start mb-2 mb-md-0">
                 <h5 class="fw-bold mb-2 footer-title">
@@ -42,6 +57,50 @@
         </div>
     </div>
 </footer>
+
+<script>
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+document.getElementById('newsletter-form')?.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const email = document.getElementById('newsletter-email').value;
+    const messageDiv = document.getElementById('newsletter-message');
+    
+    fetch('/api/subscribe-newsletter/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify({email: email})
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            messageDiv.innerHTML = '<span class="text-success">✓ ' + data.message + '</span>';
+            document.getElementById('newsletter-form').reset();
+        } else {
+            messageDiv.innerHTML = '<span class="text-danger">✗ ' + data.error + '</span>';
+        }
+    })
+    .catch(error => {
+        messageDiv.innerHTML = '<span class="text-danger">✗ Error subscribing</span>';
+    });
+});
+</script>
 
 <style>
 .footer {

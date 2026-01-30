@@ -20,6 +20,11 @@
             {% if product.in_stock %}
                 <p class="text-success">In Stock: {{product.stock}} available</p>
                 <button data-product={{product.id}} data-action="add" class="btn btn-primary btn-lg update-cart product-detail-btn">Add to Cart</button>
+                {% if user.is_authenticated %}
+                <button onclick="toggleWishlist({{product.id}})" class="btn btn-outline-danger btn-lg ms-2" id="wishlist-btn">
+                    <i class="bi bi-heart"></i> Wishlist
+                </button>
+                {% endif %}
             {% else %}
                 <p class="text-danger">Out of Stock</p>
                 <button class="btn btn-secondary btn-lg product-detail-btn" disabled>Out of Stock</button>
@@ -31,6 +36,115 @@
         </div>
     </div>
 </div>
+
+<!-- Reviews Section -->
+<div class="row mt-5">
+    <div class="col-12">
+        <h3>Customer Reviews</h3>
+        {% if user.is_authenticated %}
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5>Write a Review</h5>
+                <form id="review-form">
+                    <div class="mb-3">
+                        <label>Rating:</label>
+                        <select id="rating" class="form-select" required>
+                            <option value="">Select Rating</option>
+                            <option value="5">5 Stars - Excellent</option>
+                            <option value="4">4 Stars - Good</option>
+                            <option value="3">3 Stars - Average</option>
+                            <option value="2">2 Stars - Poor</option>
+                            <option value="1">1 Star - Terrible</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label>Comment:</label>
+                        <textarea id="comment" class="form-control" rows="3"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit Review</button>
+                </form>
+            </div>
+        </div>
+        {% else %}
+        <p><a href="{% url 'login' %}">Login</a> to write a review</p>
+        {% endif %}
+        
+        <div id="reviews-list">
+            <!-- Reviews will be loaded here -->
+        </div>
+    </div>
+</div>
+
+<script>
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function toggleWishlist(productId) {
+    fetch('/api/toggle-wishlist/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify({product_id: productId})
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const btn = document.getElementById('wishlist-btn');
+            if (data.action === 'added') {
+                btn.innerHTML = '<i class="bi bi-heart-fill"></i> In Wishlist';
+                btn.classList.remove('btn-outline-danger');
+                btn.classList.add('btn-danger');
+            } else {
+                btn.innerHTML = '<i class="bi bi-heart"></i> Wishlist';
+                btn.classList.remove('btn-danger');
+                btn.classList.add('btn-outline-danger');
+            }
+        }
+    });
+}
+
+document.getElementById('review-form')?.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const rating = document.getElementById('rating').value;
+    const comment = document.getElementById('comment').value;
+    
+    fetch('/api/add-review/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify({
+            product_id: {{product.id}},
+            rating: rating,
+            comment: comment
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Review submitted successfully!');
+            document.getElementById('review-form').reset();
+        } else {
+            alert('Error: ' + data.error);
+        }
+    });
+});
+</script>
 
 <style>
 .product-detail-content {
