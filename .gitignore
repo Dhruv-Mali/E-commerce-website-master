@@ -15,6 +15,10 @@ db.sqlite3-journal
 media/
 staticfiles/
 
+# Database Backups
+database/*.sql
+!database/README.md
+
 # Environment
 .env
 venv/
