@@ -21,12 +21,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 # SECRET_KEY = 'django-insecure-%+1mlhfyx!yrqyb+y9dirh==k3o@-h1w&f*w0$e^yu&kj%)e#@'
-SECRET_KEY = os.environ.get('SECRET_KEY')
+# Use an environment variable in production, but fall back to a development key
+# when running locally or in tests so Django doesn't raise if it's missing.
+SECRET_KEY = os.environ.get('SECRET_KEY', 'dev-secret-key-change-me')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
+# Default to True for local development and tests; set ENV DEBUG=False in production.
+DEBUG = os.environ.get('DEBUG', 'True').lower() == 'true'
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'your-domain.com']  # Update with your actual domain
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'testserver', 'testserver.com', 'your-domain.com']  # Update with your actual domain
 
 
 # Application definition

@@ -1,29 +1,276 @@
 {% extends 'index.html' %}
+{% load static %}
 
 {% block content %}
 
-<h1>Sign Up</h1>
+<div class="container mt-5 mb-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-6 col-md-8 col-12">
+      <div class="signup-card">
+        <!-- Signup Header -->
+        <div class="signup-header">
+          <h2 class="signup-title">Create Account</h2>
+          <p class="signup-subtitle">Join our store and start shopping</p>
+        </div>
 
-<form method="POST" action="">
-  {% csrf_token %}
+        {% if messages %}
+          {% for message in messages %}
+          <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+          {% endfor %}
+        {% endif %}
 
-  <div class="mb-3">
-    {{form.as_p}}
+        <form method="POST" action="">
+          {% csrf_token %}
+
+          <!-- Username Field -->
+          <div class="form-group mb-3">
+            <label class="form-label">
+              <i class="fas fa-user"></i> Username
+            </label>
+            {{ form.username }}
+            {% if form.username.errors %}
+              <div class="invalid-feedback d-block">
+                {{ form.username.errors.0 }}
+              </div>
+            {% endif %}
+            <small class="form-text text-muted">{{ form.username.help_text|safe }}</small>
+          </div>
+
+          <!-- Email Field -->
+          <div class="form-group mb-3">
+            <label class="form-label">
+              <i class="fas fa-envelope"></i> Email
+            </label>
+            {{ form.email }}
+            {% if form.email.errors %}
+              <div class="invalid-feedback d-block">
+                {{ form.email.errors.0 }}
+              </div>
+            {% endif %}
+          </div>
+
+          <!-- Phone Number Field -->
+          <div class="form-group mb-3">
+            <label class="form-label">
+              <i class="fas fa-phone"></i> Phone Number
+            </label>
+            <input 
+              type="tel" 
+              name="phone_number" 
+              class="form-control" 
+              placeholder="10-digit phone number (e.g., 9876543210)"
+              pattern="[0-9]{10}"
+              maxlength="10"
+              required
+            />
+            <small class="form-text text-muted">We'll use this for OTP login and shipping updates</small>
+          </div>
+
+          <!-- Password Field -->
+          <div class="form-group mb-3">
+            <label class="form-label">
+              <i class="fas fa-lock"></i> Password
+            </label>
+            {{ form.password1 }}
+            {% if form.password1.errors %}
+              <div class="invalid-feedback d-block">
+                {{ form.password1.errors.0 }}
+              </div>
+            {% endif %}
+            <small class="form-text text-muted">{{ form.password1.help_text|safe }}</small>
+          </div>
+
+          <!-- Confirm Password Field -->
+          <div class="form-group mb-4">
+            <label class="form-label">
+              <i class="fas fa-check-circle"></i> Confirm Password
+            </label>
+            {{ form.password2 }}
+            {% if form.password2.errors %}
+              <div class="invalid-feedback d-block">
+                {{ form.password2.errors.0 }}
+              </div>
+            {% endif %}
+          </div>
+
+          <!-- Form Errors -->
+          {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+              {% for error in form.non_field_errors %}
+                <p>{{ error }}</p>
+              {% endfor %}
+            </div>
+          {% endif %}
+
+          <!-- Submit Button -->
+          <button type="submit" class="btn btn-signup btn-lg w-100 mb-3">
+            <i class="fas fa-user-plus"></i> Create Account
+          </button>
+
+          <!-- Login Link -->
+          <div class="signup-footer">
+            <p>Already have an account? <a href="{% url 'login' %}">Login here</a></p>
+          </div>
+        </form>
+
+        <!-- Back to Store -->
+        <a href="{% url 'store' %}" class="btn btn-outline-secondary w-100">
+          <i class="fas fa-arrow-left"></i> Continue Shopping
+        </a>
+      </div>
+    </div>
   </div>
+</div>
 
-  <button type="submit" class="btn btn-outline-primary">Sign Up</button>
-  <a href="{% url 'store' %}" class="btn btn-outline-secondary">Go Back</a>
-</form><br>
+<style>
+.signup-card {
+  background: linear-gradient(135deg, #1a1a1a 0%, #0D0D0D 100%);
+  border: 1px solid rgba(123, 97, 255, 0.2);
+  border-radius: 15px;
+  padding: 2.5rem;
+  box-shadow: 0 8px 32px rgba(123, 97, 255, 0.15);
+}
 
-<span>Already Signed Up?</span>
-<a href="{% url 'login' %}" class="btn btn-outline-secondary">Login</a>
+.signup-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
 
-{% if form.errors %}
-{% for field in form %}
-{% for error in field.errors %}
-{{error}}
-{% endfor %}
-{% endfor %}
-{% endif %}
+.signup-title {
+  color: #EDEDED;
+  font-weight: 700;
+  margin: 0;
+  font-size: 1.8rem;
+}
+
+.signup-subtitle {
+  color: #A196FF;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+  margin-bottom: 0;
+}
+
+.form-group {
+  margin-bottom: 1.25rem;
+}
+
+.form-label {
+  color: #EDEDED;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.form-label i {
+  color: #7B61FF;
+  font-size: 1.1rem;
+}
+
+.form-control, input[type="tel"], input[type="email"], input[type="password"], input[type="text"] {
+  background: #0D0D0D !important;
+  border: 2px solid rgba(123, 97, 255, 0.3) !important;
+  color: #EDEDED !important;
+  padding: 0.75rem 1rem !important;
+  border-radius: 8px !important;
+  transition: all 0.3s !important;
+  font-size: 0.95rem !important;
+}
+
+input[type="tel"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="text"]:focus,
+.form-control:focus {
+  background: #0D0D0D !important;
+  border-color: #7B61FF !important;
+  color: #EDEDED !important;
+  box-shadow: 0 0 0 0.2rem rgba(123, 97, 255, 0.25) !important;
+}
+
+input[type="tel"]::placeholder,
+input[type="email"]::placeholder,
+input[type="password"]::placeholder,
+input[type="text"]::placeholder,
+.form-control::placeholder {
+  color: #555 !important;
+}
+
+.form-text {
+  color: #888 !important;
+  display: block;
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.invalid-feedback {
+  color: #ff6b6b !important;
+  font-size: 0.85rem !important;
+  margin-top: 0.25rem;
+}
+
+.btn-signup {
+  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+  border: none;
+  color: white;
+  font-weight: 600;
+  transition: all 0.3s;
+}
+
+.btn-signup:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(52, 152, 219, 0.4);
+  color: white;
+}
+
+.signup-footer {
+  text-align: center;
+  margin: 1rem 0;
+  padding: 1rem 0;
+  border-top: 1px solid rgba(123, 97, 255, 0.2);
+  border-bottom: 1px solid rgba(123, 97, 255, 0.2);
+}
+
+.signup-footer p {
+  color: #888;
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.signup-footer a {
+  color: #7B61FF;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.signup-footer a:hover {
+  color: #00C2FF;
+}
+
+.alert {
+  border: 1px solid rgba(255, 0, 0, 0.3) !important;
+  background: rgba(255, 0, 0, 0.1) !important;
+  color: #ff6b6b !important;
+  border-radius: 8px !important;
+}
+
+.alert-danger {
+  border-color: rgba(255, 0, 0, 0.3) !important;
+}
+
+@media (max-width: 768px) {
+  .signup-card {
+    padding: 1.5rem;
+  }
+
+  .signup-title {
+    font-size: 1.5rem;
+  }
+}
+</style>
 
 {% endblock content %}

@@ -1,0 +1,202 @@
+{% extends 'index.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-5 col-md-8 col-12">
+            <div class="login-card">
+                <div class="login-header">
+                    <h2 class="login-title">Login with OTP</h2>
+                    <p class="login-subtitle">Secure & Fast</p>
+                </div>
+
+                {% if messages %}
+                    {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    {% endfor %}
+                {% endif %}
+
+                <form method="POST" action="">
+                    {% csrf_token %}
+
+                    <div class="form-group mb-4">
+                        <label class="form-label">
+                            <i class="fas fa-phone"></i> Phone Number
+                        </label>
+                        <input 
+                            type="tel" 
+                            name="phone_number" 
+                            class="form-control form-control-lg" 
+                            placeholder="Enter 10-digit phone number"
+                            pattern="[0-9]{10}"
+                            required
+                        />
+                        <small class="form-text text-muted">Format: 9876543210 or +919876543210</small>
+                    </div>
+
+                    <button type="submit" class="btn btn-otp-login btn-lg w-100 mb-3">
+                        <i class="fas fa-paper-plane"></i> Send OTP
+                    </button>
+                </form>
+
+                <div class="divider">
+                    <span>OR</span>
+                </div>
+
+                <a href="{% url 'login' %}" class="btn btn-outline-secondary w-100 mb-3">
+                    <i class="fas fa-lock"></i> Login with Password
+                </a>
+
+                <div class="login-footer">
+                    <p>Don't have an account? 
+                        <a href="{% url 'register' %}" class="link-primary">Sign Up</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.login-card {
+    background: linear-gradient(135deg, #1a1a1a 0%, #0D0D0D 100%);
+    border: 1px solid rgba(123, 97, 255, 0.2);
+    border-radius: 15px;
+    padding: 2.5rem;
+    box-shadow: 0 8px 32px rgba(123, 97, 255, 0.15);
+}
+
+.login-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.login-title {
+    color: #EDEDED;
+    font-weight: 700;
+    margin: 0;
+    font-size: 1.8rem;
+}
+
+.login-subtitle {
+    color: #7B61FF;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-top: 0.5rem;
+    margin-bottom: 0;
+}
+
+.form-label {
+    color: #EDEDED;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.form-label i {
+    color: #7B61FF;
+    font-size: 1.1rem;
+}
+
+.form-control {
+    background: #0D0D0D;
+    border: 1px solid rgba(123, 97, 255, 0.3);
+    color: #EDEDED;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    transition: all 0.3s;
+}
+
+.form-control:focus {
+    background: #0D0D0D;
+    border-color: #7B61FF;
+    color: #EDEDED;
+    box-shadow: 0 0 0 0.2rem rgba(123, 97, 255, 0.25);
+}
+
+.form-control::placeholder {
+    color: #888;
+}
+
+.form-text {
+    color: #888 !important;
+}
+
+.btn-otp-login {
+    background: linear-gradient(135deg, #7B61FF 0%, #00C2FF 100%);
+    border: none;
+    color: white;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.btn-otp-login:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(123, 97, 255, 0.4);
+}
+
+.divider {
+    text-align: center;
+    margin: 1.5rem 0;
+    position: relative;
+}
+
+.divider span {
+    background: linear-gradient(135deg, #1a1a1a 0%, #0D0D0D 100%);
+    padding: 0 1rem;
+    color: #888;
+    font-size: 0.9rem;
+}
+
+.divider::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: rgba(123, 97, 255, 0.2);
+}
+
+.login-footer {
+    text-align: center;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(123, 97, 255, 0.2);
+}
+
+.login-footer p {
+    color: #A196FF;
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+.link-primary {
+    color: #7B61FF !important;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.link-primary:hover {
+    color: #00C2FF !important;
+}
+
+@media (max-width: 768px) {
+    .login-card {
+        padding: 1.5rem;
+    }
+
+    .login-title {
+        font-size: 1.5rem;
+    }
+}
+</style>
+
+{% endblock content %}

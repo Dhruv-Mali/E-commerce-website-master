@@ -1,24 +1,353 @@
 {% extends 'index.html' %}
+{% load static %}
 
 {% block content %}
 
-<h1>Login</h1>
+<div class="container mt-5 mb-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-5 col-md-8 col-12">
+      <div class="login-card">
+        <!-- Login Header -->
+        <div class="login-header">
+          <h2 class="login-title">Welcome Back</h2>
+          <p class="login-subtitle">Choose your login method</p>
+        </div>
 
-<form method="POST" action="">
-  {% csrf_token %}
+        <!-- Tab Navigation -->
+        <div class="login-tabs mb-4">
+          <button class="tab-button active" onclick="switchTab('password')">
+            <i class="fas fa-key"></i> Password
+          </button>
+          <button class="tab-button" onclick="switchTab('otp')">
+            <i class="fas fa-mobile-alt"></i> OTP
+          </button>
+        </div>
 
-  <div class="mb-3">
-    <input type="text" name="username" class="form-control" placeholder="Enter Username" /><br>
-    <input type="password" name="password" class="form-control" placeholder="Enter Password" /><br>
+        <!-- Password Login Tab -->
+        <div id="password-tab" class="tab-content active">
+          {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+              {{ message }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+          {% endif %}
+
+          <form method="POST" action="">
+            {% csrf_token %}
+            
+            <div class="form-group mb-3">
+              <label class="form-label">
+                <i class="fas fa-user"></i> Username
+              </label>
+              <input type="text" name="username" class="form-control" placeholder="Enter your username" required />
+            </div>
+
+            <div class="form-group mb-4">
+              <label class="form-label">
+                <i class="fas fa-lock"></i> Password
+              </label>
+              <input type="password" name="password" class="form-control" placeholder="Enter your password" required />
+            </div>
+
+            <button type="submit" class="btn btn-login btn-lg w-100">
+              <i class="fas fa-sign-in-alt"></i> Login
+            </button>
+          </form>
+
+          <div class="login-footer">
+            <p>Forgot password? <a href="#">Reset here</a></p>
+          </div>
+        </div>
+
+        <!-- OTP Login Tab -->
+        <div id="otp-tab" class="tab-content">
+          <div class="otp-info">
+            <i class="fas fa-info-circle"></i>
+            <p>Receive a one-time password on your registered phone number</p>
+          </div>
+
+          <a href="{% url 'otp_login' %}" class="btn btn-otp btn-lg w-100 mb-3">
+            <i class="fas fa-paper-plane"></i> Send OTP
+          </a>
+
+          <p class="text-center text-muted small">
+            Don't have OTP? Please sign up and register your phone number.
+          </p>
+        </div>
+
+        <!-- Signup Link -->
+        <div class="login-divider">
+          <span>New to our store?</span>
+        </div>
+
+        <a href="{% url 'register' %}" class="btn btn-signup btn-lg w-100 mb-3">
+          <i class="fas fa-user-plus"></i> Create Account
+        </a>
+
+        <a href="{% url 'store' %}" class="btn btn-outline-secondary w-100">
+          <i class="fas fa-arrow-left"></i> Continue Shopping
+        </a>
+      </div>
+    </div>
   </div>
+</div>
 
-  <button type="submit" class="btn btn-outline-primary">Login</button>
-
-  <a href="{% url 'store' %}" class="btn btn-outline-secondary">Go Back</a>
+<script>
+function switchTab(tab) {
+  // Hide all tabs
+  document.getElementById('password-tab').classList.remove('active');
+  document.getElementById('otp-tab').classList.remove('active');
   
-</form><br>
+  // Remove active from all buttons
+  document.querySelectorAll('.tab-button').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  
+  // Show selected tab
+  document.getElementById(tab + '-tab').classList.add('active');
+  
+  // Add active to clicked button
+  event.target.closest('.tab-button').classList.add('active');
+}
+</script>
 
-<span>Haven't Signed Up yet?</span>
-<a href="{% url 'register' %}" class="btn btn-outline-secondary">Sign Up</a>
+<style>
+.login-card {
+  background: linear-gradient(135deg, #1a1a1a 0%, #0D0D0D 100%);
+  border: 1px solid rgba(123, 97, 255, 0.2);
+  border-radius: 15px;
+  padding: 2.5rem;
+  box-shadow: 0 8px 32px rgba(123, 97, 255, 0.15);
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.login-title {
+  color: #EDEDED;
+  font-weight: 700;
+  margin: 0;
+  font-size: 1.8rem;
+}
+
+.login-subtitle {
+  color: #A196FF;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+  margin-bottom: 0;
+}
+
+.login-tabs {
+  display: flex;
+  gap: 1rem;
+  border-bottom: 2px solid rgba(123, 97, 255, 0.2);
+  padding-bottom: 0;
+}
+
+.tab-button {
+  flex: 1;
+  padding: 0.75rem;
+  background: transparent;
+  border: none;
+  color: #888;
+  font-weight: 600;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: -2px;
+}
+
+.tab-button:hover {
+  color: #A196FF;
+}
+
+.tab-button.active {
+  color: #7B61FF;
+  border-bottom-color: #7B61FF;
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+.form-label {
+  color: #EDEDED;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.form-label i {
+  color: #7B61FF;
+  font-size: 1.1rem;
+}
+
+.form-control {
+  background: #0D0D0D;
+  border: 2px solid rgba(123, 97, 255, 0.3);
+  color: #EDEDED;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  transition: all 0.3s;
+}
+
+.form-control:focus {
+  background: #0D0D0D;
+  border-color: #7B61FF;
+  color: #EDEDED;
+  box-shadow: 0 0 0 0.2rem rgba(123, 97, 255, 0.25);
+}
+
+.form-control::placeholder {
+  color: #555;
+}
+
+.btn-login {
+  background: linear-gradient(135deg, #7B61FF 0%, #00C2FF 100%);
+  border: none;
+  color: white;
+  font-weight: 600;
+  transition: all 0.3s;
+}
+
+.btn-login:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(123, 97, 255, 0.4);
+  color: white;
+}
+
+.btn-otp {
+  background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+  border: none;
+  color: white;
+  font-weight: 600;
+  transition: all 0.3s;
+}
+
+.btn-otp:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(46, 204, 113, 0.4);
+  color: white;
+}
+
+.btn-signup {
+  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+  border: none;
+  color: white;
+  font-weight: 600;
+  transition: all 0.3s;
+}
+
+.btn-signup:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(52, 152, 219, 0.4);
+  color: white;
+}
+
+.otp-info {
+  background: rgba(46, 204, 113, 0.1);
+  border-left: 4px solid #2ecc71;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  color: #2ecc71;
+}
+
+.otp-info p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.login-footer {
+  text-align: center;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(123, 97, 255, 0.2);
+}
+
+.login-footer p {
+  color: #888;
+  margin: 0;
+  font-size: 0.85rem;
+}
+
+.login-footer a {
+  color: #7B61FF;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.login-footer a:hover {
+  color: #00C2FF;
+}
+
+.login-divider {
+  text-align: center;
+  margin: 1.5rem 0;
+  position: relative;
+}
+
+.login-divider::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: rgba(123, 97, 255, 0.2);
+}
+
+.login-divider span {
+  background: linear-gradient(135deg, #1a1a1a 0%, #0D0D0D 100%);
+  padding: 0 1rem;
+  color: #888;
+  font-size: 0.85rem;
+  position: relative;
+}
+
+.text-muted {
+  color: #888 !important;
+}
+
+@media (max-width: 768px) {
+  .login-card {
+    padding: 1.5rem;
+  }
+
+  .login-title {
+    font-size: 1.5rem;
+  }
+
+  .login-tabs {
+    flex-direction: column;
+  }
+
+  .tab-button {
+    border-bottom: none;
+    border-left: 3px solid transparent;
+    margin-bottom: 0;
+    margin-left: -2px;
+    justify-content: flex-start;
+  }
+
+  .tab-button.active {
+    border-left-color: #7B61FF;
+  }
+}
+</style>
 
 {% endblock content %}

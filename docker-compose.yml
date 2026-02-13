@@ -11,14 +11,14 @@ services:
     environment:
       - DEBUG=${DEBUG}
       - SECRET_KEY=${SECRET_KEY}
-      - STRIPE_PUBLIC_KEY=${STRIPE_PUBLIC_KEY}
-      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+      - STRIPE_PUBLIC_KEY=pk_test_51SzLCn3EnjRsO1jm9njjN6ulGoj1E4wi4VoxpAdgG48oNh4x07HvgYIRoQF4BuoV88tx7utMQ4WScpvuyUV88AT2001dmWXTZ7
+      - STRIPE_SECRET_KEY=sk_test_51SzLCn3EnjRsO1jmJhLiiJCJhBYlnJGQyo4z2V3biTXGJxeq4eXk4DpN0bLdduyvX0ZhDWwLXpYmgENPP6qDyFAl00h9h4FRG6
       - EMAIL_HOST_USER=${EMAIL_HOST_USER}
       - EMAIL_HOST_PASSWORD=${EMAIL_HOST_PASSWORD}
       - DB_ENGINE=mysql
-      - DB_NAME=${DB_NAME}
-      - DB_USER=${DB_USER}
-      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=ecommerce_db
+      - DB_USER=root
+      - DB_PASSWORD=Dhruv@10
       - DB_HOST=mysql
       - DB_PORT=3306
       - ALLOWED_HOSTS=${ALLOWED_HOSTS}
@@ -36,10 +36,10 @@ services:
     image: mysql:8.0
     container_name: ecommerce-mysql
     environment:
-      MYSQL_DATABASE: ${DB_NAME}
-      MYSQL_USER: ${DB_USER}
-      MYSQL_PASSWORD: ${DB_PASSWORD}
-      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ecommerce_db
+      MYSQL_USER: root
+      MYSQL_PASSWORD: Dhruv@10
+      MYSQL_ROOT_PASSWORD: Dhruv@10
     volumes:
       - mysql_data:/var/lib/mysql
     ports:

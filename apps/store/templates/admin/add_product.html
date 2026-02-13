@@ -1,0 +1,163 @@
+{% extends 'index.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-lg-8 offset-lg-2">
+            <!-- Header -->
+            <div class="mb-4">
+                <h1 class="text-light mb-2">
+                    <i class="fas fa-plus"></i> Add New Product
+                </h1>
+                <p class="text-muted">Fill in the details below to add a new product to your store</p>
+                <hr style="border-color: #444;">
+            </div>
+
+            <!-- Form Card -->
+            <div class="card" style="background: #1a1a1a; border: 1px solid #333;">
+                <div class="card-body p-4">
+                    <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.name.id_for_label }}" class="form-label text-light">
+                                <i class="fas fa-tag"></i> Product Name
+                            </label>
+                            {% if form.name.errors %}
+                                <div class="alert alert-danger" role="alert">
+                                    {{ form.name.errors }}
+                                </div>
+                            {% endif %}
+                            {{ form.name }}
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.price.id_for_label }}" class="form-label text-light">
+                                        <i class="fas fa-dollar-sign"></i> Price ($)
+                                    </label>
+                                    {% if form.price.errors %}
+                                        <div class="alert alert-danger" role="alert">
+                                            {{ form.price.errors }}
+                                        </div>
+                                    {% endif %}
+                                    {{ form.price }}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.stock.id_for_label }}" class="form-label text-light">
+                                        <i class="fas fa-boxes"></i> Stock Quantity
+                                    </label>
+                                    {% if form.stock.errors %}
+                                        <div class="alert alert-danger" role="alert">
+                                            {{ form.stock.errors }}
+                                        </div>
+                                    {% endif %}
+                                    {{ form.stock }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.category.id_for_label }}" class="form-label text-light">
+                                        <i class="fas fa-folder"></i> Category
+                                    </label>
+                                    {% if form.category.errors %}
+                                        <div class="alert alert-danger" role="alert">
+                                            {{ form.category.errors }}
+                                        </div>
+                                    {% endif %}
+                                    {{ form.category }}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <div class="form-check mt-4">
+                                        <label for="{{ form.digital.id_for_label }}" class="form-check-label text-light">
+                                            {{ form.digital }}
+                                            <i class="fas fa-cloud"></i> Digital Product
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.description.id_for_label }}" class="form-label text-light">
+                                <i class="fas fa-align-left"></i> Description
+                            </label>
+                            {% if form.description.errors %}
+                                <div class="alert alert-danger" role="alert">
+                                    {{ form.description.errors }}
+                                </div>
+                            {% endif %}
+                            {{ form.description }}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.image.id_for_label }}" class="form-label text-light">
+                                <i class="fas fa-image"></i> Product Image
+                            </label>
+                            {% if form.image.errors %}
+                                <div class="alert alert-danger" role="alert">
+                                    {{ form.image.errors }}
+                                </div>
+                            {% endif %}
+                            <div class="input-group">
+                                <input type="file" class="form-control" id="{{ form.image.id_for_label }}" name="image" accept="image/*">
+                            </div>
+                            <small class="text-muted d-block mt-2">Recommended size: 500x500px, Max size: 2MB</small>
+                        </div>
+
+                        <!-- Form Buttons -->
+                        <div class="d-flex gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary flex-grow-1" style="background: #7B61FF; border: none; padding: 10px; font-weight: 600;">
+                                <i class="fas fa-check"></i> Add Product
+                            </button>
+                            <a href="{% url 'admin_products' %}" class="btn btn-secondary flex-grow-1" style="background: #555; border: none; padding: 10px; font-weight: 600;">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    textarea {
+        resize: vertical !important;
+        min-height: 120px !important;
+    }
+    
+    .form-control, .form-select {
+        background: #252525 !important;
+        border: 1px solid #444 !important;
+        color: #EDEDED !important;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        background: #1a1a1a !important;
+        border-color: #7B61FF !important;
+        color: #EDEDED !important;
+        box-shadow: 0 0 0 0.2rem rgba(123, 97, 255, 0.25) !important;
+    }
+    
+    .form-check-input {
+        background-color: #252525 !important;
+        border: 1px solid #444 !important;
+    }
+    
+    .form-check-input:checked {
+        background-color: #7B61FF !important;
+        border-color: #7B61FF !important;
+    }
+</style>
+{% endblock %}

@@ -24,6 +24,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('apps.store.urls')),
     path('l/', include('apps.loginsys.urls')),
+    # Add legacy /auth/ path for authentication routes
+    path('auth/', include('apps.loginsys.urls')),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -1,0 +1,208 @@
+{% extends 'index.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid mt-5">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="page-title" style="color: #EDEDED;">
+                        <i class="fas fa-receipt"></i> Manage Orders
+                    </h1>
+                    <p class="text-muted">View and track all customer orders</p>
+                </div>
+            </div>
+            <hr style="border-color: #444;">
+        </div>
+    </div>
+
+    <!-- Orders Table -->
+    <div class="row">
+        <div class="col-12">
+            {% if orders %}
+                <div class="table-responsive">
+                    <table class="table" style="background: #1a1a1a; border: 1px solid #333; color: #EDEDED;">
+                        <thead style="background: #252525; border-bottom: 2px solid #7B61FF;">
+                            <tr>
+                                <th style="color: #7B61FF;">Order ID</th>
+                                <th style="color: #7B61FF;">Customer</th>
+                                <th style="color: #7B61FF;">Date</th>
+                                <th style="color: #7B61FF;">Items</th>
+                                <th style="color: #7B61FF;">Total</th>
+                                <th style="color: #7B61FF;">Status</th>
+                                <th style="color: #7B61FF;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in orders %}
+                            <tr style="border-bottom: 1px solid #333; transition: background 0.3s ease;" onmouseover="this.style.background='#222';" onmouseout="this.style.background='transparent';">
+                                <td>
+                                    <span class="badge" style="background: #7B61FF;">#{{ order.id }}</span>
+                                </td>
+                                <td>
+                                    <strong style="color: #EDEDED;">
+                                        {{ order.customer.name|default:"Guest" }}
+                                    </strong>
+                                    <br>
+                                    <small class="text-muted">{{ order.customer.email|default:"N/A" }}</small>
+                                </td>
+                                <td>
+                                    <small class="text-muted">{{ order.date_ordered|date:'M d, Y' }}</small>
+                                    <br>
+                                    <small class="text-muted">{{ order.date_ordered|time:'H:i' }}</small>
+                                </td>
+                                <td>
+                                    <span style="color: #00C2FF;">
+                                        <i class="fas fa-box"></i> {{ order.orderitem_set.count }} items
+                                    </span>
+                                </td>
+                                <td>
+                                    <strong style="color: #FFB703; font-size: 1.1rem;">
+                                        ${{ order.get_cart_total }}
+                                    </strong>
+                                </td>
+                                <td>
+                                    {% if order.status == 'pending' %}
+                                        <span class="badge" style="background: #FFC107; color: #000;">Pending</span>
+                                    {% elif order.status == 'processing' %}
+                                        <span class="badge" style="background: #00C2FF; color: #000;">Processing</span>
+                                    {% elif order.status == 'shipped' %}
+                                        <span class="badge" style="background: #2196F3;">Shipped</span>
+                                    {% elif order.status == 'delivered' %}
+                                        <span class="badge" style="background: #4CAF50;">Delivered</span>
+                                    {% elif order.status == 'cancelled' %}
+                                        <span class="badge" style="background: #F44336;">Cancelled</span>
+                                    {% else %}
+                                        <span class="badge" style="background: #555;">{{ order.status }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <!-- View Button -->
+                                        <a href="{% url 'order-history' %}" class="btn btn-sm" style="background: #00C2FF; border: none; color: #0D0D0D;">
+                                            <i class="fas fa-eye"></i> View
+                                        </a>
+                                        
+                                        <!-- Update Status Button -->
+                                        <button type="button" class="btn btn-sm" style="background: #7B61FF; border: none; color: white;" data-bs-toggle="modal" data-bs-target="#statusModal{{ order.id }}">
+                                            <i class="fas fa-sync"></i> Update
+                                        </button>
+                                    </div>
+
+                                    <!-- Status Update Modal -->
+                                    <div class="modal fade" id="statusModal{{ order.id }}" tabindex="-1">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content" style="background: #1a1a1a; border: 1px solid #333;">
+                                                <div class="modal-header border-bottom" style="border-color: #333 !important;">
+                                                    <h5 class="modal-title text-light">Update Order Status</h5>
+                                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                                </div>
+                                                <form method="POST">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="order_id" value="{{ order.id }}">
+                                                    
+                                                    <div class="modal-body">
+                                                        <label class="form-label text-light mb-2">New Status:</label>
+                                                        <select name="status" class="form-select" style="background: #252525; border: 1px solid #444; color: #EDEDED;">
+                                                            <option value="pending" {% if order.status == 'pending' %}selected{% endif %}>Pending</option>
+                                                            <option value="processing" {% if order.status == 'processing' %}selected{% endif %}>Processing</option>
+                                                            <option value="shipped" {% if order.status == 'shipped' %}selected{% endif %}>Shipped</option>
+                                                            <option value="delivered" {% if order.status == 'delivered' %}selected{% endif %}>Delivered</option>
+                                                            <option value="cancelled" {% if order.status == 'cancelled' %}selected{% endif %}>Cancelled</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="modal-footer border-top" style="border-color: #333 !important;">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                        <button type="submit" class="btn btn-primary" style="background: #7B61FF; border: none;">
+                                                            <i class="fas fa-save"></i> Update Status
+                                                        </button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Summary -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="card" style="background: #1a1a1a; border: 1px solid #333; border-radius: 10px;">
+                            <div class="card-body">
+                                <h5 class="card-title text-light">Order Summary</h5>
+                                <p class="text-muted mb-0">
+                                    Total Orders: <strong style="color: #7B61FF;">{{ orders.count }}</strong>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <!-- Empty State -->
+                <div class="card" style="background: #1a1a1a; border: 1px solid #333; border-radius: 10px; padding: 60px 20px;">
+                    <div class="text-center">
+                        <div style="font-size: 4rem; color: #555; margin-bottom: 20px;">
+                            <i class="fas fa-inbox"></i>
+                        </div>
+                        <h4 class="text-light mb-2">No Orders Yet</h4>
+                        <p class="text-muted">You don't have any completed orders yet. When customers place orders, they will appear here.</p>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+    .page-title {
+        font-size: 2rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+    }
+    
+    .table {
+        margin-bottom: 0;
+    }
+    
+    .table th {
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        padding: 15px;
+    }
+    
+    .table td {
+        padding: 15px;
+        vertical-align: middle;
+    }
+    
+    .badge {
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+    
+    .btn-group-sm .btn {
+        padding: 5px 10px;
+        font-size: 0.85rem;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-group-sm .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .form-select:focus {
+        border-color: #7B61FF !important;
+        box-shadow: 0 0 0 0.2rem rgba(123, 97, 255, 0.25) !important;
+    }
+</style>
+{% endblock %}

@@ -30,7 +30,10 @@ class ProductModelTest(TestCase):
 class OrderModelTest(TestCase):
     def setUp(self):
         self.user = User.objects.create_user('testuser', 'test@test.com', 'password')
-        self.customer = Customer.objects.create(user=self.user, name='Test User', email='test@test.com')
+        self.customer, _ = Customer.objects.get_or_create(
+            user=self.user,
+            defaults={'name': 'Test User', 'email': 'test@test.com'}
+        )
         self.order = Order.objects.create(customer=self.customer)
         self.product = Product.objects.create(name="Test Product", price=1000, stock=10)
 
@@ -50,6 +53,8 @@ class ViewsTest(TestCase):
     def setUp(self):
         self.client = Client()
         self.user = User.objects.create_user('testuser', 'test@test.com', 'password')
+        # Ensure no duplicate Customer is created during tests
+        Customer.objects.get_or_create(user=self.user, defaults={'name': self.user.username, 'email': self.user.email})
         self.product = Product.objects.create(name="Test Product", price=1000, stock=10)
 
     def test_store_view(self):
