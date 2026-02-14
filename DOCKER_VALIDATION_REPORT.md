@@ -156,25 +156,29 @@ requests==2.31.0
 **Variables that must be set in .env file:**
 - DEBUG - Set to "False" in production
 - SECRET_KEY - Django secret key (generate new for production)
+- STRIPE_PUBLIC_KEY - Your Stripe test/live public key
+- STRIPE_SECRET_KEY - Your Stripe test/live secret key
 - EMAIL_HOST_USER - Gmail or SMTP account
 - EMAIL_HOST_PASSWORD - App-specific password
 - ALLOWED_HOSTS - Domain names (comma-separated)
 
-**Hardcoded Variables (Test Stripe Keys):**
-- STRIPE_PUBLIC_KEY=pk_test_51SzLCn3EnjRsO1jm9njjN6ulGoj1E4wi4VoxpAdgG48oNh4x07HvgYIRoQF4BuoV88tx7utMQ4WScpvuyUV88AT2001dmWXTZ7
-- STRIPE_SECRET_KEY=sk_test_51SzLCn3EnjRsO1jmJhLiiJCJhBYlnJGQyo4z2V3biTXGJxeq4eXk4DpN0bLdduyvX0ZhDWwLXpYmgENPP6qDyFAl00h9h4FRG6
+**Important:** All sensitive keys should be stored in `.env` file, not in code!
 
 ### ✅ .env File Created
 Location: `/root/.env`
 
 ```env
 DEBUG=True
-SECRET_KEY=django-insecure-your-secret-key-change-in-production
-STRIPE_PUBLIC_KEY=pk_test_51SzLCn3EnjRsO1jm9njjN6ulGoj1E4wi4VoxpAdgG48oNh4x07HvgYIRoQF4BuoV88tx7utMQ4WScpvuyUV88AT2001dmWXTZ7
-STRIPE_SECRET_KEY=sk_test_51SzLCn3EnjRsO1jmJhLiiJCJhBYlnJGQyo4z2V3biTXGJxeq4eXk4DpN0bLdduyvX0ZhDWwLXpYmgENPP6qDyFAl00h9h4FRG6
+SECRET_KEY=your-secret-key-here-change-in-production
+STRIPE_PUBLIC_KEY=pk_test_your_public_key_here
+STRIPE_SECRET_KEY=sk_test_your_secret_key_here
+TWILIO_ACCOUNT_SID=your_account_sid_here
+TWILIO_AUTH_TOKEN=your_auth_token_here
+TWILIO_PHONE_NUMBER=+1234567890
 EMAIL_HOST_USER=your_email@gmail.com
 EMAIL_HOST_PASSWORD=your_app_password
 ALLOWED_HOSTS=localhost,127.0.0.1
+DB_PASSWORD=your_secure_password
 ```
 
 ---
