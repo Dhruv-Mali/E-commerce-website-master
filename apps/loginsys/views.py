@@ -18,6 +18,10 @@ def loginUser(request):
 
         if user is not None:
             login(request, user)
+            # Redirect to 'next' URL if provided (e.g., from @staff_member_required)
+            next_url = request.GET.get('next') or request.POST.get('next', '')
+            if next_url:
+                return redirect(next_url)
             return redirect('store')
         else:
             messages.error(request, 'Invalid username or password')

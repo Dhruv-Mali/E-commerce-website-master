@@ -37,7 +37,7 @@ except ImportError:
         return query.strip()[:100] if query else ""
 
 # Custom Admin Views
-@staff_member_required
+@staff_member_required(login_url='/l/')
 def admin_dashboard(request):
     context = {
         'total_products': Product.objects.count(),
@@ -47,13 +47,13 @@ def admin_dashboard(request):
     }
     return render(request, 'admin/dashboard.html', context)
 
-@staff_member_required
+@staff_member_required(login_url='/l/')
 def admin_products(request):
     products = Product.objects.all().order_by('-created_at')
     context = {'products': products}
     return render(request, 'admin/products.html', context)
 
-@staff_member_required
+@staff_member_required(login_url='/l/')
 def admin_add_product(request):
     from .forms import ProductForm
     
@@ -69,7 +69,7 @@ def admin_add_product(request):
     context = {'form': form}
     return render(request, 'admin/add_product.html', context)
 
-@staff_member_required
+@staff_member_required(login_url='/l/')
 def admin_edit_product(request, product_id):
     from .forms import ProductForm
     
@@ -87,7 +87,7 @@ def admin_edit_product(request, product_id):
     context = {'form': form, 'product': product}
     return render(request, 'admin/edit_product.html', context)
 
-@staff_member_required
+@staff_member_required(login_url='/l/')
 def admin_delete_product(request, product_id):
     product = get_object_or_404(Product, id=product_id)
     
@@ -100,7 +100,7 @@ def admin_delete_product(request, product_id):
     context = {'product': product}
     return render(request, 'admin/delete_product.html', context)
 
-@staff_member_required
+@staff_member_required(login_url='/l/')
 def admin_orders(request):
     # ONLY show completed orders (paid orders)
     orders = Order.objects.filter(

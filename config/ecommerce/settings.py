@@ -206,6 +206,10 @@ CACHE_TTL = 60 * 15  # 15 minutes
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 SESSION_COOKIE_AGE = 86400  # 24 hours
 
+# Login Configuration
+LOGIN_URL = '/l/'
+LOGIN_REDIRECT_URL = '/store/'
+
 # Security Settings (Enable in production)
 if not DEBUG:
     SECURE_SSL_REDIRECT = True

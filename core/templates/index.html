@@ -55,8 +55,12 @@
 
     console.log('Cart:', cart)
 
-    // Update cart count in navbar
+    // Update cart count in navbar (only for anonymous users using cookie cart)
     function updateCartCount() {
+      // For authenticated users, the server already provides the correct count
+      // via the context processor. Only update from cookie for anonymous users.
+      if (user !== 'AnonymousUser') return;
+
       var cartTotal = 0;
       for(var i in cart) {
         cartTotal += cart[i].quantity;
