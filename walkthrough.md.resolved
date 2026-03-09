@@ -1,0 +1,62 @@
+# Walkthrough: Stripe → Razorpay Migration
+
+## Summary
+Successfully migrated the payment gateway from **Stripe** to **Razorpay** across the entire Django e-commerce project. The checkout flow now uses Razorpay's inline payment modal instead of Stripe's redirect-based checkout.
+
+## Files Changed
+
+| File | Change |
+|------|--------|
+| [requirements.txt](file:///c:/Users/dhruv/E-commerce-website-master-final/requirements.txt) | `stripe` → [razorpay](file:///c:/Users/dhruv/E-commerce-website-master-final/apps/store/utils.py#48-66) |
+| [requirements-docker.txt](file:///c:/Users/dhruv/E-commerce-website-master-final/requirements-docker.txt) | `stripe` → [razorpay](file:///c:/Users/dhruv/E-commerce-website-master-final/apps/store/utils.py#48-66) |
+| [.env](file:///c:/Users/dhruv/E-commerce-website-master-final/.env) | Stripe keys → Razorpay key placeholders |
+| [settings.py](file:///c:/Users/dhruv/E-commerce-website-master-final/config/ecommerce/settings.py) | `STRIPE_*` → `RAZORPAY_*` settings |
+| [docker-compose.yml](file:///c:/Users/dhruv/E-commerce-website-master-final/docker-compose.yml) | Stripe env vars → Razorpay env vars |
+| [models.py](file:///c:/Users/dhruv/E-commerce-website-master-final/apps/store/models.py) | `stripe_payment_intent` → `razorpay_payment_id` |
+| [utils.py](file:///c:/Users/dhruv/E-commerce-website-master-final/apps/store/utils.py) | Full rewrite: Razorpay order creation + signature verification |
+| [views.py](file:///c:/Users/dhruv/E-commerce-website-master-final/apps/store/views.py) | Checkout + payment_success rewritten for Razorpay flow |
+| [admin.py](file:///c:/Users/dhruv/E-commerce-website-master-final/apps/store/admin.py) | All `stripe_payment_intent` refs → `razorpay_payment_id` |
+| [checkout.html](file:///c:/Users/dhruv/E-commerce-website-master-final/apps/store/templates/store/checkout.html) | Added Razorpay JS SDK, hidden form for payment callback |
+
+## New Payment Flow
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Checkout Page
+    participant Django Server
+    participant Razorpay API
+
+    User->>Checkout Page: Fill form & click "Proceed to Payment"
+    Checkout Page->>Django Server: POST form data
+    Django Server->>Razorpay API: Create Razorpay Order
+    Razorpay API-->>Django Server: Return order_id
+    Django Server-->>Checkout Page: Render page with order_id
+    Checkout Page->>User: Open Razorpay payment modal
+    User->>Razorpay API: Complete payment in modal
+    Razorpay API-->>Checkout Page: Return payment_id + signature
+    Checkout Page->>Django Server: POST payment data
+    Django Server->>Razorpay API: Verify signature
+    Django Server-->>User: Show order success page
+```
+
+## Verification Results
+
+| Check | Result |
+|-------|--------|
+| `makemigrations` | ✅ Migration created (rename field) |
+| `migrate` | ✅ Applied successfully |
+| Model/logic tests (7) | ✅ All pass |
+| View rendering tests (3) | ⚠️ Pre-existing staticfiles error (unrelated) |
+| Razorpay import | ✅ Working (with Python 3.14 patch) |
+
+## Next Steps for You
+
+> [!IMPORTANT]
+> 1. **Add your Razorpay test keys** to [.env](file:///c:/Users/dhruv/E-commerce-website-master-final/.env):
+>    ```
+>    RAZORPAY_KEY_ID=rzp_test_your_key_here
+>    RAZORPAY_KEY_SECRET=your_secret_here
+>    ```
+>    Get them from [Razorpay Dashboard → API Keys](https://dashboard.razorpay.com/app/keys)
+> 2. Start the dev server and **test a payment** on the checkout page

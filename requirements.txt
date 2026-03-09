@@ -20,7 +20,7 @@ python-dotenv==1.2.1
 pytz==2025.2
 requests==2.32.5
 sqlparse==0.5.5
-stripe==5.4.0
+razorpay==1.4.2
 twilio==9.10.1
 tzdata==2025.3
 urllib3==2.6.3

@@ -10,7 +10,7 @@ import uuid
 try:
     from .models_extended import (
         ProductReview, Wishlist, Coupon, 
-        ProductVariant, RecentlyViewed, Newsletter
+        RecentlyViewed, Newsletter
     )
 except ImportError:
     pass  # Extended models not yet available
@@ -77,7 +77,7 @@ class Order(models.Model):
     date_ordered = models.DateTimeField(auto_now_add=True)
     complete = models.BooleanField(default=False, null=True, blank=True)
     transaction_id = models.CharField(max_length=255, null=True, blank=True, unique=True, db_index=True)
-    stripe_payment_intent = models.CharField(max_length=300, null=True, blank=True)
+    razorpay_payment_id = models.CharField(max_length=300, null=True, blank=True)
     status = models.CharField(max_length=50, default='pending', choices=[
         ('pending', 'Pending'),
         ('processing', 'Processing'),

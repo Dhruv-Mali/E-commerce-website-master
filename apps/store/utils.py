@@ -1,10 +1,10 @@
-import stripe
+import razorpay
 from django.conf import settings
 from django.core.mail import send_mail
 import json
 from .models import Product, Customer, Order, OrderItem, ShippingAddress
 
-stripe.api_key = settings.STRIPE_SECRET_KEY
+razorpay_client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
 
 
 def cookieCart(request):
@@ -45,32 +45,34 @@ def cookieCart(request):
     return {'cartItems': cartItems, 'order': order, 'items': items}
 
 
-def product_sales_pipeline(product_name, product_price, request=None):
+def create_razorpay_order(amount_paise):
+    """
+    Create a Razorpay order.
+    amount_paise: amount in paise (e.g. ₹100 = 10000 paise)
+    Returns the Razorpay order dict or raises an exception.
+    """
     try:
-        stripe_product_obj = stripe.Product.create(name=str(product_name))
-        stripe_price_obj = stripe.Price.create(
-            product=stripe_product_obj.id,
-            unit_amount=int(product_price),
-            currency='inr'
-        )
-        
-        # Get base URL from request to support any port
-        if request:
-            base_endpoint = request.build_absolute_uri('/').rstrip('/')
-        else:
-            base_endpoint = 'http://127.0.0.1:8000'
-        
-        checkout_session = stripe.checkout.Session.create(
-            line_items=[{'price': stripe_price_obj.id, 'quantity': 1}],
-            mode='payment',
-            success_url=f"{base_endpoint}/payment-success/?session_id={{CHECKOUT_SESSION_ID}}",
-            cancel_url=f"{base_endpoint}/payment-cancelled/"
-        )
-        return checkout_session.url
-    except stripe.error.AuthenticationError:
-        raise Exception("Invalid Stripe API keys. Please check your keys at https://dashboard.stripe.com/test/apikeys")
+        order_data = {
+            'amount': int(amount_paise),
+            'currency': 'INR',
+            'payment_capture': 1  # auto-capture after payment
+        }
+        razorpay_order = razorpay_client.order.create(data=order_data)
+        return razorpay_order
+    except razorpay.errors.BadRequestError as e:
+        raise Exception(f"Razorpay error: {str(e)}")
     except Exception as e:
-        raise Exception(f"Stripe error: {str(e)}")
+        raise Exception(f"Razorpay error: {str(e)}")
+
+
+def verify_razorpay_signature(payment_data):
+    """
+    Verify Razorpay payment signature.
+    payment_data must contain: razorpay_order_id, razorpay_payment_id, razorpay_signature
+    Returns True if valid, raises SignatureVerificationError otherwise.
+    """
+    razorpay_client.utility.verify_payment_signature(payment_data)
+    return True
 
 
 def send_order_confirmation_email(email, order):

@@ -62,7 +62,7 @@ class OrderAdmin(admin.ModelAdmin):
     list_display = ['transaction_id', 'customer', 'date_ordered', 'status', 'complete', 'get_cart_total', 'payment_verified']
     list_filter = ['complete', 'status', 'date_ordered']
     search_fields = ['transaction_id', 'customer__name', 'customer__email']
-    readonly_fields = ['date_ordered', 'get_cart_total', 'get_cart_items', 'transaction_id', 'stripe_payment_intent']
+    readonly_fields = ['date_ordered', 'get_cart_total', 'get_cart_items', 'transaction_id', 'razorpay_payment_id']
     inlines = [OrderItemInline]
     actions = ['mark_processing', 'mark_shipped', 'mark_delivered']
     fieldsets = (
@@ -70,7 +70,7 @@ class OrderAdmin(admin.ModelAdmin):
             'fields': ('customer', 'complete', 'status')
         }),
         ('Payment Information', {
-            'fields': ('transaction_id', 'stripe_payment_intent')
+            'fields': ('transaction_id', 'razorpay_payment_id')
         }),
         ('Order Summary', {
             'fields': ('get_cart_total', 'get_cart_items', 'date_ordered'),
@@ -82,10 +82,10 @@ class OrderAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         # ONLY show completed orders with successful payment in admin
         qs = super().get_queryset(request)
-        return qs.filter(complete=True, stripe_payment_intent__isnull=False)
+        return qs.filter(complete=True, razorpay_payment_id__isnull=False)
     
     def payment_verified(self, obj):
-        return obj.stripe_payment_intent is not None
+        return obj.razorpay_payment_id is not None
     payment_verified.boolean = True
     payment_verified.short_description = 'Payment Verified'
     

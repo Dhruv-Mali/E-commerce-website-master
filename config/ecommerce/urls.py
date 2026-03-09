@@ -26,6 +26,7 @@ urlpatterns = [
     path('l/', include('apps.loginsys.urls')),
     # Add legacy /auth/ path for authentication routes
     path('auth/', include('apps.loginsys.urls')),
+    path('i18n/', include('django.conf.urls.i18n')),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

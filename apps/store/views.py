@@ -12,11 +12,9 @@ from django.contrib import messages
 import json
 import datetime
 import random
-import stripe
+import razorpay
 
-stripe.api_key = settings.STRIPE_SECRET_KEY
-
-from .utils import cookieCart, product_sales_pipeline, send_order_confirmation_email
+from .utils import cookieCart, create_razorpay_order, verify_razorpay_signature, send_order_confirmation_email, razorpay_client
 from .models import Product, Customer, Order, OrderItem, ShippingAddress
 
 # Import validators with fallback
@@ -105,7 +103,7 @@ def admin_orders(request):
     # ONLY show completed orders (paid orders)
     orders = Order.objects.filter(
         complete=True,
-        stripe_payment_intent__isnull=False
+        razorpay_payment_id__isnull=False
     ).order_by('-date_ordered')
     
     if request.method == 'POST':
@@ -202,6 +200,9 @@ def checkout(request):
         order = cookieData['order']
         items = cookieData['items']
 
+    razorpay_order = None
+    razorpay_order_id = None
+
     if request.method == 'POST' and request.POST.get('make-payment-btn'):
         try:
             if request.user.is_authenticated:
@@ -237,11 +238,14 @@ def checkout(request):
                 order_id = order_obj.id
                 total_amount = order_obj.get_cart_total
             
-            stripe_url = product_sales_pipeline(order_id, int(total_amount * 100), request)
+            # Create Razorpay order (amount in paise)
+            razorpay_order = create_razorpay_order(int(total_amount * 100))
             
-            if stripe_url:
+            if razorpay_order:
+                razorpay_order_id = razorpay_order['id']
                 # Store order data in session for processing after payment
                 request.session['pending_order_id'] = order_id
+                request.session['razorpay_order_id'] = razorpay_order_id
                 request.session['order_data'] = {
                     'name': request.POST.get('name', ''),
                     'email': request.POST.get('email', ''),
@@ -250,13 +254,18 @@ def checkout(request):
                     'state': request.POST.get('state', ''),
                     'zipcode': request.POST.get('zipcode', '')
                 }
-                return HttpResponseRedirect(stripe_url)
             else:
                 messages.error(request, 'Payment gateway error. Please try again.')
         except Exception as e:
             messages.error(request, f'Error: {str(e)}')
         
-    context = {'items': items, 'order': order}
+    context = {
+        'items': items,
+        'order': order,
+        'razorpay_order_id': razorpay_order_id,
+        'razorpay_key_id': settings.RAZORPAY_KEY_ID,
+        'razorpay_amount': int(order.get_cart_total * 100) if hasattr(order, 'get_cart_total') and isinstance(order.get_cart_total, (int, float)) else 0,
+    }
     return render(request, 'store/checkout.html', context)
 
 def product_detail(request, pk):
@@ -295,7 +304,7 @@ def order_history(request):
     orders = Order.objects.filter(
         customer=customer,
         complete=True,
-        stripe_payment_intent__isnull=False
+        razorpay_payment_id__isnull=False
     ).order_by('-date_ordered')
     
     # Clean up any order items with deleted products
@@ -314,20 +323,23 @@ def payment_cancelled(request):
     messages.warning(request, 'Payment was cancelled. Your cart is still saved.')
     return redirect('checkout')
 
+@require_POST
 def payment_success(request):
-    session_id = request.GET.get('session_id')
+    razorpay_payment_id = request.POST.get('razorpay_payment_id')
+    razorpay_order_id = request.POST.get('razorpay_order_id')
+    razorpay_signature = request.POST.get('razorpay_signature')
     
-    if not session_id:
-        messages.error(request, 'Invalid payment session.')
+    if not all([razorpay_payment_id, razorpay_order_id, razorpay_signature]):
+        messages.error(request, 'Invalid payment data.')
         return redirect('store')
     
     try:
-        # Verify payment with Stripe
-        stripe_session = stripe.checkout.Session.retrieve(session_id)
-        
-        if stripe_session.payment_status != 'paid':
-            messages.error(request, 'Payment verification failed.')
-            return redirect('checkout')
+        # Verify payment signature with Razorpay
+        verify_razorpay_signature({
+            'razorpay_order_id': razorpay_order_id,
+            'razorpay_payment_id': razorpay_payment_id,
+            'razorpay_signature': razorpay_signature,
+        })
         
         # Get pending order from session
         pending_order_id = request.session.get('pending_order_id')
@@ -348,7 +360,7 @@ def payment_success(request):
             
             # Mark order as complete
             order.transaction_id = Order.generate_transaction_id()
-            order.stripe_payment_intent = session_id
+            order.razorpay_payment_id = razorpay_payment_id
             order.complete = True
             order.status = 'processing'
             order.save()
@@ -384,6 +396,7 @@ def payment_success(request):
             
             # Clear session data
             request.session.pop('pending_order_id', None)
+            request.session.pop('razorpay_order_id', None)
             request.session.pop('order_data', None)
             
             # Clear cart cookie
@@ -392,8 +405,8 @@ def payment_success(request):
             
             return response
             
-    except stripe.error.StripeError as e:
-        messages.error(request, f'Payment verification error: {str(e)}')
+    except razorpay.errors.SignatureVerificationError:
+        messages.error(request, 'Payment verification failed. Signature mismatch.')
         return redirect('store')
     except Exception as e:
         messages.error(request, f'Error processing order: {str(e)}')
