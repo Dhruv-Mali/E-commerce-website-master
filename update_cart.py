@@ -1,4 +1,8 @@
-{% extends 'index.html' %}
+import os
+
+filepath = r'c:\Users\dhruv\E-commerce-website-master-final\apps\store\templates\store\cart.html'
+
+html_content = """{% extends 'index.html' %}
 {% load static %}
 {% block content %}
 
@@ -228,3 +232,9 @@
 {% endif %}
 
 {% endblock content %}
+"""
+
+with open(filepath, 'w', encoding='utf-8') as f:
+    f.write(html_content)
+
+print('Success')

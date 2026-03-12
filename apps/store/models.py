@@ -27,7 +27,7 @@ class Product(models.Model):
     name = models.CharField(max_length=300, null=True, blank=True, db_index=True)
     price = models.IntegerField()
     digital = models.BooleanField(default=False, null=True, blank=True)
-    image = models.ImageField(null=True, blank=True)
+    image = models.ImageField(upload_to='products/', null=True, blank=True)
     description = models.TextField(null=True, blank=True)
     stock = models.IntegerField(default=100)
     category = models.CharField(max_length=100, null=True, blank=True, db_index=True)

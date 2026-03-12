@@ -1,40 +1,8 @@
-{% extends 'index.html' %}
-{% load static %}
+import os
 
-{% block content %}
-<div class="profile-container">
-    <div class="row justify-content-center">
-        <div class="col-12 col-md-10 col-lg-8">
-            <div class="card border-0 custom-shadow profile-card">
-                <div class="card-header profile-header">
-                    <h3 class="mb-0 profile-title">👤 My Profile</h3>
-                </div>
-                <div class="card-body profile-body">
-                    <form method="POST">
-                        {% csrf_token %}
-                        <div class="mb-3">
-                            <label class="form-label profile-label">Username</label>
-                            <input type="text" class="form-control profile-input" value="{{user.username}}" disabled>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label profile-label">Name</label>
-                            <input type="text" name="name" class="form-control profile-input" value="{{customer.name}}" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label profile-label">Email</label>
-                            <input type="email" name="email" class="form-control profile-input" value="{{customer.email}}" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary profile-btn">Update Profile</button>
-                        <a href="{% url 'store' %}" class="btn btn-outline-secondary profile-btn-back">Back to Store</a>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+filepath = r'c:\Users\dhruv\E-commerce-website-master-final\apps\loginsys\templates\loginsys\profile.html'
 
-<style>
-<style>
+css = """<style>
 .profile-container {
     padding: 3rem 0;
 }
@@ -233,5 +201,14 @@
     }
 }
 </style>
+"""
 
-{% endblock %}
+with open(filepath, 'r', encoding='utf-8') as f:
+    lines = f.readlines()
+
+with open(filepath, 'w', encoding='utf-8') as f:
+    f.writelines(lines[:36])
+    f.write(css)
+    f.write('\n{% endblock %}\n')
+
+print("Success")

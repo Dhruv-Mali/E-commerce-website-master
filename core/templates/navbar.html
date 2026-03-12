@@ -1,68 +1,56 @@
 {% load i18n %}
-<nav class="navbar navbar-expand-lg navbar-dark">
+<nav class="navbar navbar-expand-lg glass-navbar navbar-dark">
   <div class="container-fluid">
-    <a class="navbar-brand fw-bold" href="{% url 'landing' %}">
-      <span style="font-size: 1.5rem;">⚡</span> TechHub
+    <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="{% url 'landing' %}">
+      <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; background: linear-gradient(135deg, var(--c-secondary), var(--c-primary)); color: white;">⚡</div>
+      <span class="fs-5" style="letter-spacing: 0.5px;">ElectroMart</span>
     </a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+    <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
       aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+    <div class="collapse navbar-collapse mt-3 mt-lg-0" id="navbarSupportedContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0 gap-1">
         <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="{% url 'store' %}">{% trans "Store" %}</a>
+          <a class="nav-link {% if request.resolver_match.url_name == 'store' %}active{% endif %}" href="{% url 'store' %}">
+             <i class="fas fa-store me-1 d-lg-none"></i>{% trans "Store" %}
+          </a>
         </li>
         {% if request.user.is_authenticated %}
         <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="{% url 'order-history' %}">{% trans "Orders" %}</a>
+          <a class="nav-link {% if request.resolver_match.url_name == 'order-history' %}active{% endif %}" href="{% url 'order-history' %}">
+            <i class="fas fa-box-open me-1 d-lg-none"></i>{% trans "Orders" %}
+          </a>
         </li>
         {% if request.user.is_staff %}
         <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="{% url 'admin_dashboard' %}">{% trans "Admin" %}</a>
+          <a class="nav-link" href="{% url 'admin_dashboard' %}">
+            <i class="fas fa-shield-alt me-1 d-lg-none"></i>{% trans "Admin" %}
+          </a>
         </li>
         {% endif %}
         {% else %}
         <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="{% url 'login' %}">{% trans "Login" %}</a>
+          <a class="nav-link {% if request.resolver_match.url_name == 'login' %}active{% endif %}" href="{% url 'login' %}">{% trans "Login" %}</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="{% url 'register' %}">{% trans "Register" %}</a>
+          <a class="nav-link {% if request.resolver_match.url_name == 'register' %}active{% endif %}" href="{% url 'register' %}">{% trans "Register" %}</a>
         </li>
         {% endif %}
-        <li class="nav-item">
-          <a class="nav-link active position-relative" aria-current="page" href="{% url 'cart' %}">
-            ⚡ {% trans "Cart" %}
-            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill"
-              style="background-color: #7B61FF;" id="cart-total">
+        <li class="nav-item ms-lg-2">
+          <a class="nav-link active position-relative d-inline-flex align-items-center gap-2 px-3 rounded-pill" style="background: rgba(255,255,255,0.05); border: 1px solid var(--c-border);" href="{% url 'cart' %}">
+            <i class="fas fa-shopping-cart text-primary"></i> {% trans "Cart" %}
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill cart-badge-glow" id="cart-total">
               {{cartItems|default:0}}
             </span>
           </a>
         </li>
       </ul>
 
-      <!-- Language Switcher -->
-      <form action="{% url 'set_language' %}" method="post" class="d-flex align-items-center me-3">
-        {% csrf_token %}
-        <input name="next" type="hidden" value="{{ redirect_to }}">
-        <select name="language" class="form-select form-select-sm bg-dark text-white border-secondary"
-          onchange="this.form.submit()">
-          {% get_current_language as LANGUAGE_CODE %}
-          {% get_available_languages as LANGUAGES %}
-          {% get_language_info_list for LANGUAGES as languages %}
-          {% for language in languages %}
-          {% if language.code == LANGUAGE_CODE %}
-          <option value="{{ language.code }}" selected>
-            {{ language.name_local }}
-          </option>
-          {% else %}
-          <option value="{{ language.code }}">
-            {{ language.name_local }}
-          </option>
-          {% endif %}
-          {% endfor %}
-        </select>
-      </form>
+      <!-- Google Translate Switcher -->
+      <div class="d-flex align-items-center me-3">
+        <div id="google_translate_element"></div>
+      </div>
 
       {% if request.user.is_authenticated %}
       <div class="dropdown">

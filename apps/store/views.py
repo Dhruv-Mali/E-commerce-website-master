@@ -12,9 +12,7 @@ from django.contrib import messages
 import json
 import datetime
 import random
-import razorpay
-
-from .utils import cookieCart, create_razorpay_order, verify_razorpay_signature, send_order_confirmation_email, razorpay_client
+from .utils import cookieCart, create_razorpay_order, verify_razorpay_signature, send_order_confirmation_email
 from .models import Product, Customer, Order, OrderItem, ShippingAddress
 
 # Import validators with fallback
@@ -320,8 +318,9 @@ def wishlist(request):
     return render(request, 'store/wishlist.html')
 
 def payment_cancelled(request):
-    messages.warning(request, 'Payment was cancelled. Your cart is still saved.')
-    return redirect('checkout')
+    error_message = request.GET.get('error', 'Payment was cancelled. Your cart is still saved.')
+    context = {'error_message': error_message}
+    return render(request, 'store/payment_failed.html', context)
 
 @require_POST
 def payment_success(request):
@@ -330,50 +329,41 @@ def payment_success(request):
     razorpay_signature = request.POST.get('razorpay_signature')
     
     if not all([razorpay_payment_id, razorpay_order_id, razorpay_signature]):
-        messages.error(request, 'Invalid payment data.')
-        return redirect('store')
+        return render(request, 'store/payment_failed.html', {'error_message': 'Invalid payment data'})
     
     try:
-        # Verify payment signature with Razorpay
         verify_razorpay_signature({
             'razorpay_order_id': razorpay_order_id,
             'razorpay_payment_id': razorpay_payment_id,
             'razorpay_signature': razorpay_signature,
         })
-        
-        # Get pending order from session
-        pending_order_id = request.session.get('pending_order_id')
-        
-        if not pending_order_id:
-            messages.warning(request, 'Order session expired. Please contact support if payment was deducted.')
-            return redirect('store')
-        
+    except Exception as e:
+        return render(request, 'store/payment_failed.html', {'error_message': f'Signature verification failed: {str(e)}'})
+    
+    pending_order_id = request.session.get('pending_order_id')
+    if not pending_order_id:
+        return render(request, 'store/payment_failed.html', {'error_message': 'Order session expired'})
+    
+    try:
         with transaction.atomic():
             order = Order.objects.filter(id=pending_order_id, complete=False).first()
-            
             if not order:
-                messages.warning(request, 'Order not found. Please contact support if payment was deducted.')
-                return redirect('store')
+                return render(request, 'store/payment_failed.html', {'error_message': 'Order not found'})
             
-            # Get order data from session
             order_data = request.session.get('order_data', {})
-            
-            # Mark order as complete
             order.transaction_id = Order.generate_transaction_id()
             order.razorpay_payment_id = razorpay_payment_id
             order.complete = True
             order.status = 'processing'
             order.save()
             
-            # Reduce stock
             for item in order.orderitem_set.all():
                 if item.product:
                     try:
                         item.product.reduce_stock(item.quantity)
-                    except Exception as e:
-                        pass  # Continue even if stock update fails
+                    except:
+                        pass
             
-            # Save shipping address
             if order_data.get('address'):
                 try:
                     ShippingAddress.objects.create(
@@ -384,33 +374,24 @@ def payment_success(request):
                         state=order_data.get('state', ''),
                         zipcode=order_data.get('zipcode', '')
                     )
-                except Exception as e:
-                    pass  # Continue even if shipping save fails
+                except:
+                    pass
             
-            # Send confirmation email
             if order.customer.email:
                 try:
                     send_order_confirmation_email(order.customer.email, order)
-                except Exception as e:
-                    pass  # Continue even if email fails
+                except:
+                    pass
             
-            # Clear session data
             request.session.pop('pending_order_id', None)
             request.session.pop('razorpay_order_id', None)
             request.session.pop('order_data', None)
             
-            # Clear cart cookie
             response = render(request, 'store/order_success.html', {'order': order})
             response.set_cookie('cart', '{}', max_age=0)
-            
             return response
-            
-    except razorpay.errors.SignatureVerificationError:
-        messages.error(request, 'Payment verification failed. Signature mismatch.')
-        return redirect('store')
     except Exception as e:
-        messages.error(request, f'Error processing order: {str(e)}')
-        return redirect('store')
+        return render(request, 'store/payment_failed.html', {'error_message': f'Error: {str(e)}'})
 
 @require_POST
 def updateItem(request):
@@ -535,3 +516,31 @@ def processOrder(request):
             
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
+
+def generate_invoice_pdf(request, order_id):
+    from django.template.loader import get_template
+    from django.http import HttpResponse
+    from xhtml2pdf import pisa
+    
+    try:
+        if request.user.is_authenticated:
+            customer = Customer.objects.get(user=request.user)
+            order = Order.objects.get(id=order_id, customer=customer, complete=True)
+        else:
+            order = Order.objects.get(id=order_id, complete=True)
+    except (Customer.DoesNotExist, Order.DoesNotExist):
+        return HttpResponse("Order not found or not authorized.", status=404)
+
+    template_path = 'store/invoice_pdf.html'
+    context = {'order': order, 'items': order.orderitem_set.all(), 'request': request}
+    
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="ElectroMart_Invoice_{order.transaction_id}.pdf"'
+    
+    template = get_template(template_path)
+    html = template.render(context)
+
+    pisa_status = pisa.CreatePDF(html, dest=response)
+    if pisa_status.err:
+        return HttpResponse('We had some errors <pre>' + html + '</pre>')
+    return response

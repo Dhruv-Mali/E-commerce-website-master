@@ -1,10 +1,19 @@
-import razorpay
+import uuid
+import random
+import string
 from django.conf import settings
 from django.core.mail import send_mail
 import json
 from .models import Product, Customer, Order, OrderItem, ShippingAddress
 
-razorpay_client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
+# ─────────────────────────────────────────────
+#  DEMO / MOCK Razorpay client (no real API keys needed)
+# ─────────────────────────────────────────────
+class _MockRazorpayClient:
+    """Simulates the Razorpay SDK for college demo/educational projects."""
+    pass
+
+razorpay_client = _MockRazorpayClient()
 
 
 def cookieCart(request):
@@ -47,31 +56,23 @@ def cookieCart(request):
 
 def create_razorpay_order(amount_paise):
     """
-    Create a Razorpay order.
-    amount_paise: amount in paise (e.g. ₹100 = 10000 paise)
-    Returns the Razorpay order dict or raises an exception.
+    DEMO MODE: Simulates creating a Razorpay order.
+    Returns a mock order dict without calling real API.
     """
-    try:
-        order_data = {
-            'amount': int(amount_paise),
-            'currency': 'INR',
-            'payment_capture': 1  # auto-capture after payment
-        }
-        razorpay_order = razorpay_client.order.create(data=order_data)
-        return razorpay_order
-    except razorpay.errors.BadRequestError as e:
-        raise Exception(f"Razorpay error: {str(e)}")
-    except Exception as e:
-        raise Exception(f"Razorpay error: {str(e)}")
+    random_suffix = ''.join(random.choices(string.ascii_uppercase + string.digits, k=14))
+    mock_order = {
+        'id': f'order_{random_suffix}',
+        'amount': int(amount_paise),
+        'currency': 'INR',
+        'status': 'created',
+    }
+    return mock_order
 
 
 def verify_razorpay_signature(payment_data):
     """
-    Verify Razorpay payment signature.
-    payment_data must contain: razorpay_order_id, razorpay_payment_id, razorpay_signature
-    Returns True if valid, raises SignatureVerificationError otherwise.
+    DEMO MODE: Always returns True (no real signature check needed).
     """
-    razorpay_client.utility.verify_payment_signature(payment_data)
     return True
 
 

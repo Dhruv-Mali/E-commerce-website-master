@@ -15,7 +15,10 @@
                     <strong class="order-id">Order #{{order.transaction_id|slice:":8"}}</strong>
                 </div>
                 <div class="col-md-6 col-12 text-md-end">
-                    <small class="order-date">{{order.date_ordered|date:"M d, Y h:i A"}}</small>
+                    <small class="order-date me-3">{{order.date_ordered|date:"M d, Y h:i A"}}</small>
+                    <a href="{% url 'generate_invoice' order.id %}" class="btn btn-sm btn-outline-light" target="_blank" title="Download Bill">
+                        <i class="fas fa-file-pdf"></i> Bill
+                    </a>
                 </div>
             </div>
         </div>

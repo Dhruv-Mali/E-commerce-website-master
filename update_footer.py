@@ -1,4 +1,7 @@
-<!-- Compact Glassmorphic Footer -->
+import os
+
+filepath = r'c:\Users\dhruv\E-commerce-website-master-final\core\templates\footer.html'
+html = """<!-- Compact Glassmorphic Footer -->
 <footer class="footer mt-auto" style="background: var(--c-surface); color: var(--text-muted); border-top: 1px solid var(--c-border); backdrop-filter: blur(10px); z-index: 10;">
     <div class="container-fluid px-4 py-3">
         <div class="row align-items-center mb-0 g-3">
@@ -66,3 +69,8 @@
     font-size: 0.7rem;
 }
 </style>
+"""
+
+with open(filepath, 'w', encoding='utf-8') as f:
+    f.write(html)
+print("Success")

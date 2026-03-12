@@ -28,4 +28,5 @@ urlpatterns = [
     path('api/toggle-wishlist/', toggle_wishlist, name='toggle-wishlist'),
     path('api/wishlist/', get_wishlist, name='get-wishlist'),
     path('api/subscribe-newsletter/', subscribe_newsletter, name='subscribe-newsletter'),
+    path('invoice/<int:order_id>/', views.generate_invoice_pdf, name='generate_invoice'),
 ]

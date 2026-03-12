@@ -1,0 +1,144 @@
+{% extends 'index.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8 col-12">
+            <div class="card payment-failure-card">
+                <div class="card-body text-center py-5">
+                    <!-- Error Icon -->
+                    <div class="mb-4">
+                        <i class="fas fa-times-circle" style="font-size: 4rem; color: #dc3545;"></i>
+                    </div>
+
+                    <!-- Error Title -->
+                    <h2 class="mb-3" style="color: #EDEDED;">Payment Failed</h2>
+                    <p class="text-muted mb-4">Unfortunately, your payment could not be processed.</p>
+
+                    <!-- Error Details -->
+                    {% if error_message %}
+                    <div class="alert alert-danger mb-4" style="text-align: left;">
+                        <strong>Error Details:</strong>
+                        <p class="mb-0 mt-2">{{ error_message }}</p>
+                    </div>
+                    {% endif %}
+
+                    <!-- Common Reasons -->
+                    <div class="alert alert-info mb-4" style="text-align: left;">
+                        <strong>Common Reasons:</strong>
+                        <ul class="mb-0 mt-2">
+                            <li>Insufficient funds in your account</li>
+                            <li>Card has expired or is blocked</li>
+                            <li>Incorrect card details or OTP</li>
+                            <li>Network connectivity issue</li>
+                            <li>Payment gateway timeout</li>
+                        </ul>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'checkout' %}" class="btn btn-primary btn-lg mb-2">
+                            <i class="fas fa-redo"></i> Try Again
+                        </a>
+                        <a href="{% url 'cart' %}" class="btn btn-outline-secondary btn-lg mb-2">
+                            <i class="fas fa-shopping-cart"></i> Back to Cart
+                        </a>
+                        <a href="{% url 'store' %}" class="btn btn-outline-secondary btn-lg">
+                            <i class="fas fa-store"></i> Continue Shopping
+                        </a>
+                    </div>
+
+                    <!-- Support Info -->
+                    <div class="mt-4 pt-4 border-top">
+                        <p class="text-muted small mb-2">Need help?</p>
+                        <p class="text-muted small">
+                            <i class="fas fa-envelope"></i> Email: support@example.com<br>
+                            <i class="fas fa-phone"></i> Phone: +91-XXXXXXXXXX
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .payment-failure-card {
+        background: #1a1a1a;
+        border: 1px solid rgba(220, 53, 69, 0.3);
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(220, 53, 69, 0.2);
+    }
+
+    .payment-failure-card .card-body {
+        padding: 2rem;
+    }
+
+    .payment-failure-card h2 {
+        font-weight: 600;
+    }
+
+    .payment-failure-card .alert {
+        background: rgba(220, 53, 69, 0.1);
+        border-color: #dc3545;
+        color: #EDEDED;
+    }
+
+    .payment-failure-card .alert-info {
+        background: rgba(123, 97, 255, 0.1);
+        border-color: #7B61FF;
+    }
+
+    .payment-failure-card .btn {
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        border-radius: 8px;
+    }
+
+    .payment-failure-card .btn-primary {
+        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        border: none;
+    }
+
+    .payment-failure-card .btn-primary:hover {
+        background: linear-gradient(135deg, #c82333 0%, #bd2130 100%);
+    }
+
+    .payment-failure-card .btn-outline-secondary {
+        color: #A196FF;
+        border-color: #A196FF;
+    }
+
+    .payment-failure-card .btn-outline-secondary:hover {
+        background: #A196FF;
+        border-color: #A196FF;
+        color: #0D0D0D;
+    }
+
+    .payment-failure-card ul {
+        padding-left: 1.5rem;
+    }
+
+    .payment-failure-card ul li {
+        margin-bottom: 0.5rem;
+    }
+
+    @media (max-width: 768px) {
+        .payment-failure-card .card-body {
+            padding: 1.5rem;
+        }
+
+        .payment-failure-card h2 {
+            font-size: 1.5rem;
+        }
+
+        .payment-failure-card .btn {
+            padding: 0.65rem 1.25rem;
+            font-size: 0.95rem;
+        }
+    }
+</style>
+
+{% endblock content %}

@@ -58,8 +58,7 @@
                     </div>
 
                     <hr>
-                    <button type="submit" name="make-payment-btn" value="make-payment-btn"
-                        class="btn btn-success btn-payment w-100">
+                    <button type="button" id="payment-btn" class="btn btn-success btn-payment w-100">
                         <i class="bi bi-lock-fill"></i> Proceed to Payment
                     </button>
                 </form>
@@ -105,12 +104,10 @@
                 <hr>
                 <div class="d-flex justify-content-between mb-3 summary-total">
                     <h5 class="total-label">Total:</h5>
-                    <h5 class="text-success total-value">₹{% if order.shipping
-                        %}{{order.get_cart_total|add:50|floatformat:0}}{% else
-                        %}{{order.get_cart_total|floatformat:0}}{% endif %}</h5>
+                    <h5 class="text-success total-value">₹{% if order.shipping %}{{order.get_cart_total|add:50|floatformat:0}}{% else %}{{order.get_cart_total|floatformat:0}}{% endif %}</h5>
                 </div>
 
-                <div class="alert alert-info checkout-alert">
+                <div class="alert alert-info checkout-alert" data-razorpay-order-id="{{ razorpay_order_id }}" data-razorpay-key-id="{{ razorpay_key_id }}" data-razorpay-amount="{{ razorpay_amount }}">
                     <small><i class="bi bi-shield-check"></i> Secure payment powered by Razorpay</small>
                 </div>
                 {% else %}
@@ -123,8 +120,67 @@
     </div>
 </div>
 
-<!-- Razorpay JS SDK -->
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<!-- Demo Payment Modal (simulates Razorpay for college project) -->
+<div id="demo-payment-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.75); z-index:9999; align-items:center; justify-content:center;">
+    <div style="background:#fff; border-radius:12px; width:390px; max-width:95vw; box-shadow:0 20px 60px rgba(0,0,0,0.4); overflow:hidden; font-family:'Segoe UI',sans-serif;">
+        <!-- Header -->
+        <div style="background:#072654; padding:18px 22px; display:flex; align-items:center; justify-content:space-between;">
+            <div style="display:flex; align-items:center; gap:12px;">
+                <div style="background:#fff; border-radius:6px; padding:4px 8px; font-weight:800; font-size:13px; color:#072654; letter-spacing:0.5px;">razorpay</div>
+                <div style="color:#a0c4ff; font-size:13px;" id="demo-modal-merchant">Phone Store</div>
+            </div>
+            <button onclick="closeDemoModal()" style="background:none; border:none; color:#fff; font-size:20px; cursor:pointer; line-height:1;">&times;</button>
+        </div>
+        <!-- Amount bar -->
+        <div style="background:#0f3460; padding:12px 22px; color:#fff; font-size:14px;">
+            Pay &nbsp;<strong id="demo-modal-amount" style="font-size:18px;">₹0</strong>
+            <span style="float:right; font-size:11px; background:rgba(255,255,255,0.15); border-radius:4px; padding:3px 8px; margin-top:2px;">🔒 Secure Checkout</span>
+        </div>
+        <!-- Card form -->
+        <div style="padding:22px;">
+            <div id="demo-card-form">
+                <p style="margin:0 0 14px; font-size:13px; color:#555;">Enter card details to complete payment</p>
+                <div style="margin-bottom:12px;">
+                    <label style="font-size:12px; color:#888; display:block; margin-bottom:4px;">CARD NUMBER</label>
+                    <input id="demo-card-number" type="text" maxlength="19" placeholder="4111 1111 1111 1111"
+                        style="width:100%; padding:10px 12px; border:1px solid #ddd; border-radius:6px; font-size:14px; box-sizing:border-box;"
+                        oninput="formatCard(this)" />
+                </div>
+                <div style="display:flex; gap:10px; margin-bottom:12px;">
+                    <div style="flex:1;">
+                        <label style="font-size:12px; color:#888; display:block; margin-bottom:4px;">EXPIRY</label>
+                        <input id="demo-expiry" type="text" maxlength="5" placeholder="MM/YY"
+                            style="width:100%; padding:10px 12px; border:1px solid #ddd; border-radius:6px; font-size:14px; box-sizing:border-box;"
+                            oninput="formatExpiry(this)" />
+                    </div>
+                    <div style="flex:1;">
+                        <label style="font-size:12px; color:#888; display:block; margin-bottom:4px;">CVV</label>
+                        <input id="demo-cvv" type="password" maxlength="3" placeholder="•••"
+                            style="width:100%; padding:10px 12px; border:1px solid #ddd; border-radius:6px; font-size:14px; box-sizing:border-box;" />
+                    </div>
+                </div>
+                <div id="demo-card-error" style="color:#e53935; font-size:12px; margin-bottom:8px; display:none;"></div>
+                <button onclick="processDemoPayment()" id="demo-pay-btn"
+                    style="width:100%; padding:13px; background:linear-gradient(135deg,#528ff5,#3c6fc4); color:#fff; border:none; border-radius:6px; font-size:15px; font-weight:600; cursor:pointer; letter-spacing:0.3px;">
+                    Pay Now
+                </button>
+                <p style="text-align:center; font-size:11px; color:#aaa; margin:10px 0 0;">
+                    🔒 256-bit SSL secured &nbsp;|&nbsp; Demo Mode
+                </p>
+            </div>
+            <!-- Processing spinner -->
+            <div id="demo-processing" style="display:none; text-align:center; padding:20px 0;">
+                <div style="display:inline-block; width:42px; height:42px; border:4px solid #e0e0e0; border-top-color:#528ff5; border-radius:50%; animation:spin 0.8s linear infinite;"></div>
+                <p style="margin:14px 0 0; color:#444; font-size:14px;">Processing your payment…</p>
+                <p style="margin:4px 0 0; color:#888; font-size:12px;">Please do not close this window</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
 
 <!-- Hidden form to POST payment data to server -->
 <form id="razorpay-payment-form" method="POST" action="{% url 'payment-success' %}" style="display:none;">
@@ -139,151 +195,325 @@
     var user = '{{request.user}}';
 
     // Pre-fill user info if logged in
-    if (user != 'AnonymousUser') {
-        var nameInput = document.querySelector('input[name="name"]');
-        var emailInput = document.querySelector('input[name="email"]');
-        if (nameInput) nameInput.value = '{{request.user.username}}';
-        if (emailInput) emailInput.value = '{{request.user.email}}';
-    }
+    document.addEventListener('DOMContentLoaded', function () {
+        if (user != 'AnonymousUser') {
+            var nameInput = document.querySelector('input[name="name"]');
+            var emailInput = document.querySelector('input[name="email"]');
+            if (nameInput) nameInput.value = '{{request.user.username}}';
+            if (emailInput) emailInput.value = '{{request.user.email}}';
+        }
+    });
 
     // Hide shipping info for digital products
-    if (shipping == 'False') {
-        var shippingInfo = document.getElementById('shipping-info');
-        if (shippingInfo) shippingInfo.style.display = 'none';
+    document.addEventListener('DOMContentLoaded', function () {
+        if (shipping == 'False') {
+            var shippingInfo = document.getElementById('shipping-info');
+            if (shippingInfo) shippingInfo.style.display = 'none';
+        }
+    });
+
+    // ── Card input formatters ──────────────────────────────
+    function formatCard(el) {
+        var v = el.value.replace(/\D/g, '').substring(0, 16);
+        el.value = v.replace(/(.{4})/g, '$1 ').trim();
+    }
+    function formatExpiry(el) {
+        var v = el.value.replace(/\D/g, '').substring(0, 4);
+        if (v.length >= 3) v = v.substring(0,2) + '/' + v.substring(2);
+        el.value = v;
     }
 
-    // If Razorpay order was created, open the payment modal automatically
-    {% if razorpay_order_id %}
-    document.addEventListener('DOMContentLoaded', function () {
-        var options = {
-            "key": "{{ razorpay_key_id }}",
-            "amount": "{{ razorpay_amount }}",
-            "currency": "INR",
-            "name": "Phone Store",
-            "description": "Order Payment",
-            "order_id": "{{ razorpay_order_id }}",
-            "handler": function (response) {
-                // On successful payment, submit the payment data to our server
-                document.getElementById('razorpay-payment-id').value = response.razorpay_payment_id;
-                document.getElementById('razorpay-order-id').value = response.razorpay_order_id;
-                document.getElementById('razorpay-signature').value = response.razorpay_signature;
-                document.getElementById('razorpay-payment-form').submit();
-            },
-            "prefill": {
-                "name": document.getElementById('checkout-name') ? document.getElementById('checkout-name').value : "",
-                "email": document.getElementById('checkout-email') ? document.getElementById('checkout-email').value : ""
-            },
-            "theme": {
-                "color": "#7B61FF"
-            },
-            "modal": {
-                "ondismiss": function () {
-                    // User closed the Razorpay modal without paying
-                    // Optionally show a message
+    // ── Open / Close modal ────────────────────────────────
+    function openDemoModal(orderId, amount) {
+        document.getElementById('demo-modal-amount').textContent = '₹' + Math.round(amount / 100).toLocaleString('en-IN');
+        document.getElementById('razorpay-order-id').value = orderId;
+        document.getElementById('demo-payment-modal').style.display = 'flex';
+    }
+    function closeDemoModal() {
+        document.getElementById('demo-payment-modal').style.display = 'none';
+        document.getElementById('demo-card-error').style.display = 'none';
+    }
+
+    // ── Process demo payment ──────────────────────────────
+    function processDemoPayment() {
+        var cardNum = document.getElementById('demo-card-number').value.replace(/\s/g, '');
+        var expiry  = document.getElementById('demo-expiry').value;
+        var cvv     = document.getElementById('demo-cvv').value;
+        var errEl   = document.getElementById('demo-card-error');
+
+        errEl.style.display = 'none';
+
+        if (cardNum.length < 16) { errEl.textContent = 'Please enter a valid 16‑digit card number.'; errEl.style.display = 'block'; return; }
+        if (expiry.length < 5)   { errEl.textContent = 'Please enter a valid expiry (MM/YY).';       errEl.style.display = 'block'; return; }
+        if (cvv.length < 3)      { errEl.textContent = 'Please enter a valid 3‑digit CVV.';          errEl.style.display = 'block'; return; }
+
+        // Show processing spinner
+        document.getElementById('demo-card-form').style.display = 'none';
+        document.getElementById('demo-processing').style.display = 'block';
+
+        // Generate mock payment ID & signature
+        var mockPaymentId  = 'pay_demo_' + Math.random().toString(36).substring(2, 16).toUpperCase();
+        var mockSignature  = 'demo_sig_' + Math.random().toString(36).substring(2, 32);
+
+        document.getElementById('razorpay-payment-id').value = mockPaymentId;
+        document.getElementById('razorpay-signature').value  = mockSignature;
+
+        // Simulate 2s processing delay then submit
+        setTimeout(function () {
+            document.getElementById('razorpay-payment-form').submit();
+        }, 2000);
+    }
+
+    // ── Handle "Proceed to Payment" click ────────────────
+    document.getElementById('payment-btn').addEventListener('click', function (e) {
+        e.preventDefault();
+
+        var form        = document.getElementById('checkout-form');
+        var nameInput   = document.querySelector('input[name="name"]');
+        var emailInput  = document.querySelector('input[name="email"]');
+        var addressInput = document.querySelector('input[name="address"]');
+        var cityInput   = document.querySelector('input[name="city"]');
+        var stateInput  = document.querySelector('input[name="state"]');
+        var zipcodeInput = document.querySelector('input[name="zipcode"]');
+
+        // Validate required fields
+        if (!nameInput.value.trim())  { alert('Please enter your name');         nameInput.focus();    return; }
+        if (!emailInput.value.trim()) { alert('Please enter your email');        emailInput.focus();   return; }
+        if (shipping != 'False') {
+            if (!addressInput.value.trim()) { alert('Please enter your address'); addressInput.focus(); return; }
+            if (!cityInput.value.trim())    { alert('Please enter your city');    cityInput.focus();    return; }
+            if (!stateInput.value.trim())   { alert('Please enter your state');   stateInput.focus();   return; }
+            if (!zipcodeInput.value.trim()) { alert('Please enter your postal code'); zipcodeInput.focus(); return; }
+        }
+
+        // Submit form to create the (mock) Razorpay order
+        var formData = new FormData(form);
+        formData.append('make-payment-btn', 'true');
+
+        fetch(form.action || '', {
+            method: 'POST',
+            body: formData,
+            headers: { 'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value }
+        })
+        .then(response => response.text())
+        .then(html => {
+            var parser = new DOMParser();
+            var doc = parser.parseFromString(html, 'text/html');
+            var el = doc.querySelector('[data-razorpay-order-id]');
+
+            if (el && el.getAttribute('data-razorpay-order-id')) {
+                var orderId = el.getAttribute('data-razorpay-order-id');
+                var amount  = el.getAttribute('data-razorpay-amount');
+                if (orderId && amount) {
+                    openDemoModal(orderId, amount);
+                } else {
+                    showPaymentError('Payment gateway error. Please try again.');
                 }
+            } else {
+                showPaymentError('Unable to initialize payment. Please try again.');
             }
-        };
-        var rzp = new Razorpay(options);
-        rzp.on('payment.failed', function (response) {
-            alert('Payment failed: ' + response.error.description);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showPaymentError('An error occurred. Please try again.');
         });
-        rzp.open();
     });
-    {% endif %}
+
+    function showPaymentError(message) {
+        var alertDiv = document.createElement('div');
+        alertDiv.className = 'alert alert-danger alert-dismissible fade show';
+        alertDiv.role = 'alert';
+        alertDiv.innerHTML = '<strong>Payment Error!</strong><br>' + message +
+                            '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
+        var formBody = document.querySelector('.checkout-form-body');
+        if (formBody) formBody.insertBefore(alertDiv, formBody.firstChild);
+        alertDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
 </script>
 
+<style>
 <style>
     .checkout-row {
         margin: 0;
     }
 
     .checkout-card {
-        background: #1a1a1a;
-        border: 1px solid rgba(123, 97, 255, 0.3);
+        background: var(--c-surface);
+        border: 1px solid var(--c-border);
+        border-radius: 20px;
+        backdrop-filter: blur(12px);
+        box-shadow: var(--shadow-glow);
     }
 
     .checkout-form-body,
     .checkout-summary-body {
-        padding: 1.5rem;
+        padding: 2rem;
     }
 
     .checkout-title {
-        color: #EDEDED;
-        font-size: 1.5rem;
+        color: var(--text-main);
+        font-size: 1.6rem;
+        font-weight: 800;
+        letter-spacing: -0.5px;
     }
 
     .checkout-section-title {
-        color: #A196FF;
+        color: var(--c-secondary);
         font-size: 1.1rem;
-        margin-bottom: 1rem;
+        font-weight: 600;
+        margin-bottom: 1.2rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
     }
 
     .checkout-input {
-        background: #0D0D0D;
-        border: 2px solid rgba(123, 97, 255, 0.3);
-        color: #EDEDED;
-        padding: 0.75rem;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--c-border);
+        color: var(--text-main);
+        padding: 0.8rem 1rem;
         font-size: 1rem;
+        border-radius: 12px;
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
 
     .checkout-input:focus {
-        background: #0D0D0D;
-        border-color: #7B61FF;
-        color: #EDEDED;
-        box-shadow: 0 0 0 0.2rem rgba(123, 97, 255, 0.25);
+        background: rgba(0, 0, 0, 0.2);
+        border-color: var(--c-primary);
+        color: var(--text-main);
+        box-shadow: 0 0 0 4px rgba(123, 97, 255, 0.1);
+        outline: none;
+    }
+    
+    .checkout-input::placeholder {
+        color: var(--text-muted);
+        opacity: 0.7;
     }
 
     .btn-payment {
-        padding: 0.85rem 1.5rem;
+        padding: 1rem 1.5rem;
         font-size: 1.1rem;
-        font-weight: 600;
-        background: linear-gradient(135deg, #00C2FF 0%, #7B61FF 100%);
+        font-weight: 700;
+        background: linear-gradient(135deg, var(--c-secondary), var(--c-primary));
+        color: white;
         border: none;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(123, 97, 255, 0.3);
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        letter-spacing: 0.5px;
     }
 
     .btn-payment:hover {
-        background: linear-gradient(135deg, #7B61FF 0%, #00C2FF 100%);
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(123, 97, 255, 0.5);
+        color: white;
     }
 
     .order-items {
         max-height: 400px;
         overflow-y: auto;
+        padding-right: 0.5rem;
+    }
+    
+    .order-items::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    .order-items::-webkit-scrollbar-thumb {
+        background: rgba(123, 97, 255, 0.3);
+        border-radius: 10px;
+    }
+
+    .order-item {
+        background: var(--glass-bg);
+        border: 1px solid var(--glass-border) !important;
+        border-radius: 12px;
+        padding: 1rem !important;
+        transition: all 0.3s ease;
+    }
+    
+    .order-item:hover {
+        background: rgba(123, 97, 255, 0.05);
+        transform: translateX(5px);
     }
 
     .order-item-img {
-        width: 70px;
-        height: 70px;
+        width: 60px;
+        height: 60px;
         object-fit: cover;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        border: 1px solid rgba(255,255,255,0.1);
     }
 
     .order-item-name {
-        color: #EDEDED;
-        font-size: 1rem;
+        color: var(--text-main);
+        font-size: 1.05rem;
+        font-weight: 600;
     }
 
     .order-item-qty {
         font-size: 0.85rem;
+        color: var(--c-secondary) !important;
     }
 
     .order-item-price {
-        color: #EDEDED;
+        color: var(--text-main);
+        font-size: 1.1rem;
+    }
+
+    .summary-row {
+        padding: 0.5rem 0;
+    }
+
+    .summary-label {
+        color: var(--text-muted);
         font-size: 1rem;
+        font-weight: 500;
     }
-
-    .summary-label,
+    
     .summary-value {
-        font-size: 0.95rem;
+        color: var(--text-main);
+        font-size: 1.05rem;
     }
 
-    .total-label,
+    .total-label {
+        color: var(--text-main);
+        font-size: 1.3rem;
+        font-weight: 800;
+    }
+    
     .total-value {
-        font-size: 1.25rem;
+        font-size: 1.5rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, var(--c-secondary), var(--c-primary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
     }
 
     .checkout-alert {
         background: rgba(123, 97, 255, 0.1);
-        border-color: #7B61FF;
-        color: #EDEDED;
+        border: 1px solid rgba(123, 97, 255, 0.3);
+        color: var(--c-secondary);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .back-btn {
+        border-radius: 20px;
+        padding: 0.4rem 1rem;
+        border: 1px solid var(--glass-border);
+        color: var(--text-muted);
+        background: var(--glass-bg);
+        transition: all 0.3s;
+    }
+    
+    .back-btn:hover {
+        background: rgba(255,255,255,0.05);
+        color: var(--text-main);
+        border-color: var(--c-border);
     }
 
     /* Tablet Responsive */
@@ -305,7 +535,7 @@
 
         .checkout-form-body,
         .checkout-summary-body {
-            padding: 1rem;
+            padding: 1.5rem;
         }
 
         .checkout-title {
@@ -318,18 +548,18 @@
         }
 
         .checkout-input {
-            padding: 0.65rem;
-            font-size: 0.9rem;
+            padding: 0.75rem;
+            font-size: 0.95rem;
         }
 
         .btn-payment {
-            padding: 0.75rem 1.25rem;
+            padding: 0.85rem 1.25rem;
             font-size: 1rem;
         }
 
         .back-btn {
             font-size: 0.85rem;
-            padding: 0.5rem 0.75rem;
+            padding: 0.5rem 1rem;
         }
 
         .order-items {
@@ -337,12 +567,78 @@
         }
 
         .order-item-img {
-            width: 60px;
-            height: 60px;
+            width: 50px;
+            height: 50px;
         }
 
         .order-item-name {
+            font-size: 0.95rem;
+        }
+
+        .order-item-qty {
+            font-size: 0.8rem;
+        }
+
+        .order-item-price {
+            font-size: 1rem;
+        }
+
+        .summary-label,
+        .summary-value {
             font-size: 0.9rem;
+        }
+
+        .total-label {
+            font-size: 1.15rem;
+        }
+        
+        .total-value {
+            font-size: 1.3rem;
+        }
+
+        .checkout-alert {
+            font-size: 0.9rem;
+            padding: 0.75rem;
+        }
+    }
+
+    /* Small Mobile */
+    @media (max-width: 576px) {
+
+        .checkout-form-body,
+        .checkout-summary-body {
+            padding: 1rem;
+        }
+
+        .checkout-title {
+            font-size: 1.1rem;
+        }
+
+        .checkout-section-title {
+            font-size: 0.9rem;
+        }
+
+        .checkout-input {
+            padding: 0.7rem;
+            font-size: 0.9rem;
+        }
+
+        .btn-payment {
+            padding: 0.75rem 1rem;
+            font-size: 0.95rem;
+        }
+
+        .order-items {
+            max-height: 240px;
+        }
+
+        .order-item-img {
+            width: 45px;
+            height: 45px;
+        }
+
+        .order-item-name {
+            font-size: 0.85rem;
         }
 
         .order-item-qty {
@@ -358,72 +654,12 @@
             font-size: 0.85rem;
         }
 
-        .total-label,
+        .total-label {
+            font-size: 1.05rem;
+        }
+        
         .total-value {
-            font-size: 1.1rem;
-        }
-
-        .checkout-alert {
-            font-size: 0.85rem;
-            padding: 0.75rem;
-        }
-    }
-
-    /* Small Mobile */
-    @media (max-width: 576px) {
-
-        .checkout-form-body,
-        .checkout-summary-body {
-            padding: 0.75rem;
-        }
-
-        .checkout-title {
-            font-size: 1.1rem;
-        }
-
-        .checkout-section-title {
-            font-size: 0.9rem;
-        }
-
-        .checkout-input {
-            padding: 0.6rem;
-            font-size: 0.85rem;
-        }
-
-        .btn-payment {
-            padding: 0.7rem 1rem;
-            font-size: 0.95rem;
-        }
-
-        .order-items {
-            max-height: 240px;
-        }
-
-        .order-item-img {
-            width: 50px;
-            height: 50px;
-        }
-
-        .order-item-name {
-            font-size: 0.85rem;
-        }
-
-        .order-item-qty {
-            font-size: 0.7rem;
-        }
-
-        .order-item-price {
-            font-size: 0.85rem;
-        }
-
-        .summary-label,
-        .summary-value {
-            font-size: 0.8rem;
-        }
-
-        .total-label,
-        .total-value {
-            font-size: 1rem;
+            font-size: 1.2rem;
         }
     }
 </style>
