@@ -504,7 +504,8 @@ Educational use. Modify and use freely.
 
 ---
 
-## 📞 Support
+## 📞  Support
+Dhruv Mali: Dhruvmali9039@gmail.com
 
 **Having Issues?**
 1. Check documentation
