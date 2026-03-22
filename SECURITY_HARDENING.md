@@ -157,9 +157,8 @@ python manage.py check --deploy
 - [ ] HTTPS/SSL enabled
 - [ ] Database password changed
 - [ ] Email SMTP configured
-- [ ] Stripe in production mode
 - [ ] Razorpay in production mode
-- [ ] Twilio credentials updated
+- [ ] Twilio credentials updated (if using OTP)
 - [ ] Server firewall configured
 - [ ] Regular security updates enabled
 - [ ] Monitoring and logging setup

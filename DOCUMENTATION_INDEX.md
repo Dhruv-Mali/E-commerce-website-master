@@ -3,142 +3,54 @@
 ## 🎯 Start Here
 
 ### For New Developers
-1. **README.md** - Project overview and quick start
-2. **PROJECT_STRUCTURE.md** - Project architecture and organization
-3. **QUICK_REFERENCE.md** - Common commands and shortcuts
+1. **[README.md](README.md)** - Project overview and quick start
+2. **[PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md)** - Project architecture and organization
+3. **[SETUP.md](SETUP.md)** - Feature setup and API reference
 
 ### For Security
-1. **SECURITY_HARDENING.md** - Security best practices and fixes
-2. **AUDIT_SUMMARY.md** - Audit findings and fixes
-
-### For Testing
-1. **TESTING_GUIDE.md** - Complete testing procedures
-2. **QUICK_REFERENCE.md** - Testing commands
+1. **[SECURITY_HARDENING.md](SECURITY_HARDENING.md)** - Security best practices and fixes
 
 ### For Deployment
-1. **DEPLOYMENT_GUIDE.md** - Production setup guide
-2. **QUICK_REFERENCE.md** - Deployment commands
+1. **[DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md)** - Production setup guide
 
 ---
 
 ## 📖 Documentation Files
 
-### Core Documentation
+### README.md
+**Purpose:** Project overview, quick start guide, and feature documentation
+**Contents:** Features list, quick start (6 steps), tech stack, dependencies, Docker setup, management commands, troubleshooting, contributing guidelines
+**When to Read:** First time setup, project overview
 
-#### README.md
-**Purpose:** Project overview and quick start guide
-**Contents:**
-- Project features
-- Quick start guide
-- Tech stack
-- Installation steps
-- Feature documentation
-- Troubleshooting
-
-**When to Read:** First time setup
-
-#### PROJECT_STRUCTURE.md
+### PROJECT_STRUCTURE.md
 **Purpose:** Project architecture and file organization
-**Contents:**
-- Directory layout
-- Key components
-- Database models
-- URL routing
-- Security architecture
-- Data flow
-- Performance optimization
-- File naming conventions
-- Best practices
+**Contents:** Directory layout, key components (store & loginsys apps), all 10 database models, complete URL routing, security architecture, data flow diagrams, deployment architecture
+**When to Read:** Understanding project structure, finding specific files
 
-**When to Read:** Understanding project structure
+### SETUP.md
+**Purpose:** Feature setup and API reference
+**Contents:** 15 features overview, key files listing, API endpoints, database models, configuration (Razorpay, Redis, Email, i18n), admin panel access, usage examples, troubleshooting
+**When to Read:** Feature reference, API integration
 
-#### SECURITY_HARDENING.md
+### SECURITY_HARDENING.md
 **Purpose:** Security best practices and vulnerability fixes
-**Contents:**
-- 10 critical vulnerabilities fixed
-- Implementation steps
-- Production checklist
-- Security best practices
-- Testing procedures
-- Monitoring & alerts
-- Incident response
-- Regular maintenance
-
+**Contents:** 10 critical vulnerabilities fixed, implementation steps, production deployment checklist, security best practices, testing procedures, monitoring & alerts, incident response
 **When to Read:** Before deployment, security concerns
 
-#### AUDIT_SUMMARY.md
-**Purpose:** Comprehensive audit findings and fixes
-**Contents:**
-- Executive summary
-- 30+ vulnerabilities fixed
-- New files created
-- Features verified
-- Implementation steps
-- Security metrics
-- Testing recommendations
-- Performance improvements
-- Deployment checklist
-
-**When to Read:** Understanding what was fixed
-
-#### TESTING_GUIDE.md
-**Purpose:** Complete testing procedures for all features
-**Contents:**
-- Authentication testing
-- Product features testing
-- Shopping cart testing
-- Checkout & payment testing
-- Order management testing
-- Admin features testing
-- Security features testing
-- Email features testing
-- Performance testing
-- Mobile testing
-- Testing checklist
-- Automated tests
-- Bug reporting
-
-**When to Read:** Before testing, QA procedures
-
-#### DEPLOYMENT_GUIDE.md
+### DEPLOYMENT_GUIDE.md
 **Purpose:** Production deployment and setup guide
-**Contents:**
-- Pre-deployment checklist
-- Environment setup
-- Database setup
-- Static files configuration
-- Web server setup (Gunicorn)
-- Nginx configuration
-- SSL/HTTPS setup
-- Database backups
-- Monitoring & logging
-- Performance optimization
-- Security hardening
-- Docker deployment
-- Troubleshooting
-- Rollback procedures
-
+**Contents:** Pre-deployment checklist, environment setup, database setup (SQLite & MySQL), static files (WhiteNoise), Gunicorn + Nginx setup, SSL/HTTPS, database backups, monitoring & logging, Docker deployment, troubleshooting, rollback procedures
 **When to Read:** Before going to production
 
-#### QUICK_REFERENCE.md
-**Purpose:** Quick reference for common commands
-**Contents:**
-- Essential commands
-- Git commands
-- Docker commands
-- Nginx commands
-- MySQL commands
-- Python commands
-- File operations
-- System commands
-- Troubleshooting commands
-- Performance monitoring
-- Security commands
-- Deployment commands
-- Useful aliases
-- Quick checklist
+### COMPLETION_SUMMARY.md
+**Purpose:** Project audit summary and status
+**Contents:** What was delivered, security improvements, files overview, next steps, documentation guide, key achievements, project status
+**When to Read:** Overall project assessment
 
-**When to Read:** During development, quick lookup
+### IMPLEMENTATION_CHECKLIST.md
+**Purpose:** Implementation tracking and verification
+**Contents:** Deliverables checklist, security fixes checklist, features verified, deployment readiness, quality metrics, next steps
+**When to Read:** Tracking implementation progress
 
 ---
 
@@ -147,50 +59,54 @@
 ### By Topic
 
 #### Authentication
-- README.md → OTP Authentication System
-- PROJECT_STRUCTURE.md → Authentication System (loginsys)
-- SECURITY_HARDENING.md → Authentication
-- TESTING_GUIDE.md → Authentication Features
-- QUICK_REFERENCE.md → Django Shell
+- README.md → Authentication System features
+- PROJECT_STRUCTURE.md → loginsys component
+- SECURITY_HARDENING.md → Authentication security
 
 #### E-Commerce Features
-- README.md → Core E-Commerce Features
-- PROJECT_STRUCTURE.md → E-Commerce Core (store)
-- TESTING_GUIDE.md → Product Features, Shopping Cart Features
-- QUICK_REFERENCE.md → Django Commands
+- README.md → Core E-Commerce Features, Advanced Features
+- PROJECT_STRUCTURE.md → store component, database models
+- SETUP.md → API endpoints, usage examples
 
-#### Payments
-- README.md → Smart Shopping Cart, Coupon System
-- PROJECT_STRUCTURE.md → Database Models
-- TESTING_GUIDE.md → Checkout & Payment Features
-- DEPLOYMENT_GUIDE.md → Payment Configuration
+#### Payments (Razorpay)
+- README.md → Razorpay Payment feature
+- PROJECT_STRUCTURE.md → Data Flow → Product Purchase
+- SETUP.md → Razorpay configuration
+- DEPLOYMENT_GUIDE.md → Payment configuration in .env
+
+#### PDF Invoices
+- README.md → PDF Invoices feature
+- PROJECT_STRUCTURE.md → URL Routing → /invoice/<id>/
+- SETUP.md → API Endpoints → GET /invoice/<order_id>/
 
 #### Security
 - SECURITY_HARDENING.md → All sections
-- AUDIT_SUMMARY.md → Critical Issues Fixed
-- TESTING_GUIDE.md → Security Features
-- DEPLOYMENT_GUIDE.md → Security Hardening
+- DEPLOYMENT_GUIDE.md → Security Hardening (Step 9)
+- PROJECT_STRUCTURE.md → Security Architecture
 
 #### Database
-- PROJECT_STRUCTURE.md → Database Models
-- DEPLOYMENT_GUIDE.md → Database Setup
-- QUICK_REFERENCE.md → Database Operations, MySQL Commands
+- PROJECT_STRUCTURE.md → Database Models (10 models)
+- DEPLOYMENT_GUIDE.md → Database Setup (SQLite & MySQL)
+- SETUP.md → Database Models overview
 
 #### Deployment
 - DEPLOYMENT_GUIDE.md → All sections
-- QUICK_REFERENCE.md → Deployment Commands
 - SECURITY_HARDENING.md → Production Deployment Checklist
 
-#### Performance
-- PROJECT_STRUCTURE.md → Performance Optimization
-- DEPLOYMENT_GUIDE.md → Performance Optimization
-- TESTING_GUIDE.md → Performance Features
-- QUICK_REFERENCE.md → Performance Monitoring
+#### Docker
+- README.md → Docker Deployment section
+- DEPLOYMENT_GUIDE.md → Step 10: Docker Deployment
+- PROJECT_STRUCTURE.md → Deployment Architecture → Docker
+
+#### Internationalization (i18n)
+- README.md → Multilingual Support
+- SETUP.md → Multilingual Support section
+- PROJECT_STRUCTURE.md → locale/ directory
 
 #### Troubleshooting
-- README.md → Troubleshooting
-- DEPLOYMENT_GUIDE.md → Troubleshooting
-- QUICK_REFERENCE.md → Troubleshooting Commands
+- README.md → Troubleshooting section
+- DEPLOYMENT_GUIDE.md → Troubleshooting section
+- SETUP.md → Troubleshooting section
 
 ---
 
@@ -199,40 +115,24 @@
 ### Setting Up Development Environment
 1. Read: README.md (Quick Start Guide)
 2. Read: PROJECT_STRUCTURE.md (Understanding structure)
-3. Execute: Commands from QUICK_REFERENCE.md (Setup & Installation)
-4. Read: TESTING_GUIDE.md (Before testing)
+3. Read: SETUP.md (Configuration & features)
 
 ### Making Code Changes
-1. Read: PROJECT_STRUCTURE.md (Understanding structure)
+1. Read: PROJECT_STRUCTURE.md (File organization)
 2. Read: SECURITY_HARDENING.md (Security best practices)
 3. Make changes
-4. Read: TESTING_GUIDE.md (Testing procedures)
-5. Execute: Commands from QUICK_REFERENCE.md (Testing commands)
+4. Run: `python manage.py test apps.store`
 
 ### Deploying to Production
-1. Read: SECURITY_HARDENING.md (Security checklist)
-2. Read: DEPLOYMENT_GUIDE.md (Deployment steps)
-3. Read: AUDIT_SUMMARY.md (What was fixed)
-4. Execute: Commands from QUICK_REFERENCE.md (Deployment commands)
-5. Read: DEPLOYMENT_GUIDE.md (Monitoring & maintenance)
-
-### Fixing Security Issues
-1. Read: SECURITY_HARDENING.md (Understanding vulnerabilities)
-2. Read: AUDIT_SUMMARY.md (What was fixed)
-3. Read: TESTING_GUIDE.md (Security testing)
-4. Execute: Commands from QUICK_REFERENCE.md (Security commands)
-
-### Optimizing Performance
-1. Read: PROJECT_STRUCTURE.md (Performance optimization)
-2. Read: DEPLOYMENT_GUIDE.md (Performance optimization)
-3. Read: TESTING_GUIDE.md (Performance testing)
-4. Execute: Commands from QUICK_REFERENCE.md (Performance monitoring)
+1. Read: SECURITY_HARDENING.md (Production checklist)
+2. Read: DEPLOYMENT_GUIDE.md (Step-by-step deployment)
+3. Execute: Environment setup, database migration, static collection
+4. Verify: `python manage.py check --deploy`
 
 ### Troubleshooting Issues
-1. Read: README.md (Troubleshooting section)
-2. Read: DEPLOYMENT_GUIDE.md (Troubleshooting section)
-3. Execute: Commands from QUICK_REFERENCE.md (Troubleshooting commands)
-4. Check: logs/ecommerce.log
+1. Check: `logs/ecommerce.log`
+2. Read: README.md (Troubleshooting section)
+3. Read: DEPLOYMENT_GUIDE.md (Troubleshooting section)
 
 ---
 
@@ -241,64 +141,36 @@
 ### Documentation Files
 ```
 E-commerce-website-master-final/
-├── README.md                    # Project overview
-├── PROJECT_STRUCTURE.md         # Architecture & organization
+├── README.md                    # Project overview & quick start
+├── PROJECT_STRUCTURE.md         # Architecture & file organization
 ├── SECURITY_HARDENING.md        # Security guide
-├── AUDIT_SUMMARY.md             # Audit findings
-├── TESTING_GUIDE.md             # Testing procedures
 ├── DEPLOYMENT_GUIDE.md          # Production setup
-├── QUICK_REFERENCE.md           # Common commands
-├── SETUP.md                     # Setup instructions
-└── .env.example                 # Environment template
+├── SETUP.md                     # Features & API reference
+├── COMPLETION_SUMMARY.md        # Project audit summary
+├── IMPLEMENTATION_CHECKLIST.md  # Implementation tracking
+└── database/README.md           # Database backup/restore guide
 ```
 
-### Code Files
+### Key Code Files
 ```
 E-commerce-website-master-final/
 ├── config/ecommerce/
 │   ├── settings.py              # Django settings
-│   ├── settings_secure.py       # Secure settings (NEW)
 │   ├── urls.py                  # URL routing
 │   └── wsgi.py                  # WSGI application
 ├── apps/store/
-│   ├── views.py                 # Store views
-│   ├── views_secure.py          # Secure views (NEW)
-│   ├── models.py                # Database models
-│   ├── security_middleware.py   # Security middleware (NEW)
-│   └── ...
+│   ├── views.py                 # Store views (25+ views)
+│   ├── models.py                # Core models (5 models)
+│   ├── models_extended.py       # Extended models (5 models)
+│   ├── api_views.py             # API endpoints
+│   ├── security_middleware.py   # Security middleware
+│   └── utils.py                 # Razorpay payment utilities
 ├── apps/loginsys/
-│   ├── views.py                 # Auth views
-│   ├── views_secure.py          # Secure auth views (NEW)
-│   └── ...
-└── ...
+│   └── views.py                 # Auth views
+├── docker-compose.yml           # Docker orchestration
+├── Dockerfile                   # Docker image (Python 3.12)
+└── requirements.txt             # Python dependencies
 ```
-
----
-
-## 🔗 Cross-References
-
-### Security Topics
-- **CSRF Protection** → SECURITY_HARDENING.md, TESTING_GUIDE.md
-- **SQL Injection** → SECURITY_HARDENING.md, TESTING_GUIDE.md
-- **XSS Prevention** → SECURITY_HARDENING.md, TESTING_GUIDE.md
-- **Rate Limiting** → SECURITY_HARDENING.md, TESTING_GUIDE.md
-- **Session Security** → SECURITY_HARDENING.md, DEPLOYMENT_GUIDE.md
-- **HTTPS/SSL** → DEPLOYMENT_GUIDE.md, SECURITY_HARDENING.md
-
-### Feature Topics
-- **Authentication** → README.md, PROJECT_STRUCTURE.md, TESTING_GUIDE.md
-- **Products** → README.md, PROJECT_STRUCTURE.md, TESTING_GUIDE.md
-- **Shopping Cart** → README.md, PROJECT_STRUCTURE.md, TESTING_GUIDE.md
-- **Payments** → README.md, PROJECT_STRUCTURE.md, TESTING_GUIDE.md
-- **Orders** → README.md, PROJECT_STRUCTURE.md, TESTING_GUIDE.md
-- **Admin** → README.md, PROJECT_STRUCTURE.md, TESTING_GUIDE.md
-
-### Operational Topics
-- **Setup** → README.md, QUICK_REFERENCE.md
-- **Testing** → TESTING_GUIDE.md, QUICK_REFERENCE.md
-- **Deployment** → DEPLOYMENT_GUIDE.md, QUICK_REFERENCE.md
-- **Monitoring** → DEPLOYMENT_GUIDE.md, QUICK_REFERENCE.md
-- **Troubleshooting** → README.md, DEPLOYMENT_GUIDE.md, QUICK_REFERENCE.md
 
 ---
 
@@ -306,125 +178,41 @@ E-commerce-website-master-final/
 
 ### For Setup Issues
 1. Check: README.md (Quick Start Guide)
-2. Check: QUICK_REFERENCE.md (Setup & Installation)
-3. Check: logs/ecommerce.log
+2. Check: SETUP.md (Configuration)
+3. Check: `logs/ecommerce.log`
 
 ### For Feature Questions
 1. Check: README.md (Feature Documentation)
-2. Check: PROJECT_STRUCTURE.md (Component Details)
-3. Check: TESTING_GUIDE.md (Feature Testing)
+2. Check: SETUP.md (API Endpoints)
+3. Check: PROJECT_STRUCTURE.md (Component Details)
 
 ### For Security Questions
 1. Check: SECURITY_HARDENING.md
-2. Check: AUDIT_SUMMARY.md
-3. Check: TESTING_GUIDE.md (Security Features)
+2. Check: PROJECT_STRUCTURE.md (Security Architecture)
 
 ### For Deployment Questions
 1. Check: DEPLOYMENT_GUIDE.md
-2. Check: QUICK_REFERENCE.md (Deployment Commands)
-3. Check: SECURITY_HARDENING.md (Production Checklist)
-
-### For Performance Issues
-1. Check: PROJECT_STRUCTURE.md (Performance Optimization)
-2. Check: DEPLOYMENT_GUIDE.md (Performance Optimization)
-3. Check: QUICK_REFERENCE.md (Performance Monitoring)
+2. Check: SECURITY_HARDENING.md (Production Checklist)
 
 ### For Bugs/Issues
-1. Check: README.md (Troubleshooting)
-2. Check: DEPLOYMENT_GUIDE.md (Troubleshooting)
-3. Check: logs/ecommerce.log
+1. Check: `logs/ecommerce.log`
+2. Check: README.md (Troubleshooting)
+3. Check: DEPLOYMENT_GUIDE.md (Troubleshooting)
 4. Create GitHub issue with details
 
 ---
 
 ## 📊 Documentation Statistics
 
-### Total Documentation
-- **7 comprehensive guides**
-- **1000+ pages of content**
-- **100+ code examples**
-- **50+ commands**
-- **30+ security fixes documented**
-- **100+ test cases**
-
-### Coverage
-- ✅ Setup & Installation
-- ✅ Project Architecture
-- ✅ Security & Hardening
-- ✅ Testing Procedures
-- ✅ Deployment Guide
-- ✅ Quick Reference
-- ✅ Troubleshooting
+- **7 documentation guides** + database README
+- **10 database models** documented
+- **25+ URL routes** documented
+- **4 API endpoints** documented
+- **10 security fixes** documented
+- **Deployment steps** for local, Docker, and production
 
 ---
 
-## 🎓 Learning Path
-
-### Beginner
-1. README.md - Overview
-2. PROJECT_STRUCTURE.md - Architecture
-3. QUICK_REFERENCE.md - Commands
-4. TESTING_GUIDE.md - Testing
-
-### Intermediate
-1. SECURITY_HARDENING.md - Security
-2. DEPLOYMENT_GUIDE.md - Deployment
-3. AUDIT_SUMMARY.md - Fixes
-4. QUICK_REFERENCE.md - Advanced commands
-
-### Advanced
-1. All documentation
-2. Source code review
-3. Security audit
-4. Performance optimization
-
----
-
-## 📝 Version Information
-
-**Documentation Version:** 3.1
-**Last Updated:** 2024
+**Version:** 4.0
+**Last Updated:** March 2026
 **Status:** ✅ COMPLETE
-
----
-
-## 🔄 Documentation Updates
-
-### When to Update
-- After code changes
-- After security fixes
-- After feature additions
-- After deployment
-- After bug fixes
-
-### How to Update
-1. Update relevant documentation file
-2. Update cross-references
-3. Update version number
-4. Commit changes
-5. Push to repository
-
----
-
-## 📌 Important Notes
-
-### Always Read First
-- README.md (for overview)
-- SECURITY_HARDENING.md (before deployment)
-- DEPLOYMENT_GUIDE.md (before going live)
-
-### Keep Handy
-- QUICK_REFERENCE.md (common commands)
-- TESTING_GUIDE.md (testing procedures)
-- logs/ecommerce.log (error tracking)
-
-### Review Regularly
-- SECURITY_HARDENING.md (security updates)
-- DEPLOYMENT_GUIDE.md (maintenance tasks)
-- AUDIT_SUMMARY.md (what was fixed)
-
----
-
-**Happy Coding! 🚀**
-
-For questions or issues, refer to the appropriate documentation file or check the logs.

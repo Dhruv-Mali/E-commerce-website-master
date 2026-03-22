@@ -1,40 +1,40 @@
 # 🛒 E-Commerce Website with OTP Authentication
 
-A full-featured, **production-ready** e-commerce platform built with Django, MySQL, and modern web technologies featuring advanced OTP authentication, complete payment integration, comprehensive admin interface, and **enterprise-grade security**.
+A full-featured, **production-ready** e-commerce platform built with Django, MySQL/SQLite, and modern web technologies featuring OTP authentication, Razorpay payment integration, PDF invoices, multilingual support, comprehensive admin interface, and **enterprise-grade security**.
 
 **Status:** ✅ SECURE | ✅ TESTED | ✅ DOCUMENTED | ✅ PRODUCTION-READY
 
 ## ✨ Key Features
 
-### 🔐 Advanced Authentication (OTP System)
-- 📱 **SMS-Based OTP Login** - Secure OTP via Twilio integration
-- 🔑 **Traditional Password Login** - Username/password authentication with strong validation
-- 📞 **Phone Verification** - Phone-based secure authentication
-- ⏱️ **Smart OTP Resend** - 30-second cooldown timer
-- ✅ **Automatic OTP Expiration** - 5-minute validity period
-- 🛡️ **Rate Limiting** - Max 5 login attempts per 15 minutes
-- 📊 **Transaction Logging** - Complete OTP history
+### 🔐 Authentication System
+- 🔑 **Password Login** - Username/password authentication with strong validation
+- 👤 **User Registration** - Secure registration with form validation
+- 📞 **OTP Support** - SMS-Based OTP via Twilio integration (optional)
+- 🛡️ **Rate Limiting** - Brute force protection
 - 🔒 **Session Security** - HttpOnly, Secure, SameSite cookies
 
 ### 🏪 Core E-Commerce Features
 - 🛍️ **Product Catalog** - Categories, filtering, search with XSS protection
-- 🛒 **Smart Shopping Cart** - Guest & authenticated users with stock validation
+- 🛒 **Smart Shopping Cart** - Guest (cookie-based) & authenticated (database) users with stock validation
 - 💳 **Razorpay Payment** - Secure payment processing with signature verification
-- 📦 **Order Management** - Complete order tracking with status updates
-- 👤 **User Profiles** - Account management & history
-- 📧 **Email Notifications** - Confirmations & updates
+- 📦 **Order Management** - Complete order tracking with status updates (pending → processing → shipped → delivered)
+- 🧾 **PDF Invoices** - Downloadable invoice generation for orders
+- 👤 **User Profiles** - Account management & order history
+- 📧 **Email Notifications** - Order confirmations & updates
 - 🔐 **CSRF Protection** - All forms protected
 
 ### ⭐ Advanced Features
 - ⭐ **Reviews & Ratings** - 1-5 star system with verified purchase badges
 - ❤️ **Wishlist** - Save favorite products
-- 📧 **Newsletter** - Email subscription & campaigns
+- 📧 **Newsletter** - Email subscription management
 - 🎟️ **Coupons** - Discount codes with validation
 - 👁️ **Recently Viewed** - Product history tracking
-- 📊 **Admin Dashboard** - Full management interface with permission checks
+- 📊 **Custom Admin Dashboard** - Product, order & customer management with permission checks
 - 🔍 **Full-Text Search** - Advanced filtering with SQL injection prevention
+- 🌐 **Multilingual (i18n)** - English & Hindi language support
+- 🏠 **Landing Page** - Modern landing page with tech theme
 
-### 🔒 Security Features (NEW)
+### 🔒 Security Features
 - ✅ **30+ Vulnerabilities Fixed** - Enterprise-grade security
 - 🛡️ **Security Headers** - X-Frame-Options, CSP, HSTS
 - 🔐 **Input Validation** - All user inputs sanitized
@@ -46,17 +46,16 @@ A full-featured, **production-ready** e-commerce platform built with Django, MyS
 
 ---
 
-## 📚 Documentation (NEW)
+## 📚 Documentation
 
-### Essential Guides
+### Available Guides
 - **[SECURITY_HARDENING.md](SECURITY_HARDENING.md)** - Security best practices & fixes
 - **[PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md)** - Project architecture & organization
-- **[TESTING_GUIDE.md](TESTING_GUIDE.md)** - Complete testing procedures (100+ test cases)
 - **[DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md)** - Production deployment guide
-- **[AUDIT_SUMMARY.md](AUDIT_SUMMARY.md)** - Security audit findings
-- **[QUICK_REFERENCE.md](QUICK_REFERENCE.md)** - Common commands (50+)
 - **[DOCUMENTATION_INDEX.md](DOCUMENTATION_INDEX.md)** - Find any information
-- **[NEXT_STEPS.md](NEXT_STEPS.md)** - Implementation roadmap
+- **[SETUP.md](SETUP.md)** - Feature setup & API reference
+- **[COMPLETION_SUMMARY.md](COMPLETION_SUMMARY.md)** - Project audit summary
+- **[IMPLEMENTATION_CHECKLIST.md](IMPLEMENTATION_CHECKLIST.md)** - Implementation status
 
 ---
 
@@ -64,10 +63,10 @@ A full-featured, **production-ready** e-commerce platform built with Django, MyS
 
 ### Prerequisites
 ```
-- Python 3.8+
-- MySQL 8.0+
-- Twilio Account (for OTP)
+- Python 3.10+ (Docker uses 3.12)
+- MySQL 8.0+ (optional, SQLite by default)
 - Razorpay Account (for payments)
+- Twilio Account (optional, for OTP)
 ```
 
 ### Step 1: Clone & Setup
@@ -87,29 +86,14 @@ pip install -r requirements.txt
 ```
 
 ### Step 3: Configure Environment
-Copy `.env.example` and configure:
-```bash
-cp .env.example .env
-# Edit .env with your values
-```
-
-**Generate Strong SECRET_KEY:**
-```bash
-python manage.py shell
->>> from django.core.management.utils import get_random_secret_key
->>> print(get_random_secret_key())
-# Copy output to .env
-```
-
-**Required Environment Variables:**
+Create a `.env` file in the project root:
 ```env
-# Django (CHANGE THESE IN PRODUCTION)
+# Django
+DEBUG=True
 SECRET_KEY=your-generated-50-char-key
-DEBUG=False
-ALLOWED_HOSTS=localhost,127.0.0.1,yourdomain.com
 
-# Database
-DB_ENGINE=sqlite3  # or mysql
+# Database (SQLite used by default, set to mysql for MySQL)
+DB_ENGINE=sqlite3
 DB_NAME=ecommerce_db
 DB_USER=root
 DB_PASSWORD=your_secure_password
@@ -120,17 +104,23 @@ DB_PORT=3306
 RAZORPAY_KEY_ID=your_key_id
 RAZORPAY_KEY_SECRET=your_key_secret
 
-# SMS/OTP - Twilio
-TWILIO_ACCOUNT_SID=your_account_sid
-TWILIO_AUTH_TOKEN=your_auth_token
-TWILIO_PHONE_NUMBER=+1234567890
-
 # Email
 EMAIL_HOST=smtp.gmail.com
 EMAIL_PORT=587
 EMAIL_HOST_USER=your_email@gmail.com
 EMAIL_HOST_PASSWORD=your_app_password
 EMAIL_USE_TLS=True
+
+# Allowed Hosts
+ALLOWED_HOSTS=localhost,127.0.0.1
+```
+
+**Generate Strong SECRET_KEY:**
+```bash
+python manage.py shell
+>>> from django.core.management.utils import get_random_secret_key
+>>> print(get_random_secret_key())
+# Copy output to .env
 ```
 
 ### Step 4: Initialize Database
@@ -142,24 +132,17 @@ python manage.py createsuperuser
 python manage.py check --deploy
 ```
 
-### Step 5: Load Sample Data (Optional)
-```bash
-python setup_database.py
-python setup_improvements.py
-```
-
-### Step 6: Start Server
+### Step 5: Start Server
 ```bash
 python manage.py runserver
 ```
 
-### Step 7: Access Application
+### Step 6: Access Application
 ```
-Website: http://127.0.0.1:8000/
-Admin:   http://127.0.0.1:8000/admin/
-Login:   http://127.0.0.1:8000/l/
-
-Note: Change default admin password immediately!
+Website:  http://127.0.0.1:8000/         (Landing Page)
+Store:    http://127.0.0.1:8000/store/    (Product Catalog)
+Admin:    http://127.0.0.1:8000/admin/    (Django Admin)
+Login:    http://127.0.0.1:8000/l/        (User Login)
 ```
 
 ---
@@ -170,7 +153,7 @@ Note: Change default admin password immediately!
 ✅ **CSRF Protection** - All POST requests protected
 ✅ **SQL Injection Prevention** - Parameterized queries + detection middleware
 ✅ **XSS Prevention** - Input escaping + Content Security Policy
-✅ **Rate Limiting** - Brute force protection (5 attempts/15 min)
+✅ **Rate Limiting** - Brute force protection
 ✅ **Session Security** - HttpOnly, Secure, SameSite cookies
 ✅ **Security Headers** - X-Frame-Options, CSP, HSTS, etc.
 ✅ **Input Validation** - All user inputs sanitized
@@ -185,8 +168,7 @@ Note: Change default admin password immediately!
 - [ ] HTTPS/SSL enabled
 - [ ] Database password changed
 - [ ] Email credentials secured
-- [ ] Payment keys in production mode
-- [ ] Twilio credentials updated
+- [ ] Razorpay keys in production mode
 - [ ] Backups configured
 - [ ] Monitoring setup
 
@@ -196,35 +178,25 @@ Note: Change default admin password immediately!
 
 ## 🔍 Troubleshooting
 
-### OTP Not Received
-```
-Check:
-1. Twilio credentials in .env
-2. Phone number format (+country code)
-3. Twilio account balance
-4. Check logs: tail -f logs/ecommerce.log
-```
-
 ### Payment Not Working
 ```
 Check:
 1. Razorpay keys in .env
 2. Razorpay account in test mode
-3. Test card: 4242 4242 4242 4242
-4. Check Razorpay dashboard
-5. Verify webhook configuration
+3. Check Razorpay dashboard for errors
+4. Verify webhook configuration
 ```
 
 ### Static Files Not Loading
 ```bash
 python manage.py collectstatic --no-input
-ls -la staticfiles/
+dir staticfiles\
 ```
 
 ### Database Connection Error
 ```bash
-# Check MySQL
-sudo systemctl status mysql
+# For SQLite (default) - check db.sqlite3 exists
+# For MySQL:
 mysql -u root -p -e "SELECT 1"
 ```
 
@@ -234,11 +206,11 @@ mysql -u root -p -e "SELECT 1"
 
 ## 📊 Admin Dashboard
 
+### Django Admin
 **Access:** http://localhost:8000/admin/
 
 **Sections:**
 - Users & Profiles
-- OTP Records & Logs
 - Products & Inventory
 - Product Images
 - Reviews & Ratings
@@ -248,11 +220,14 @@ mysql -u root -p -e "SELECT 1"
 - Newsletter Subscribers
 - Recently Viewed
 
-**Admin Credentials:**
-```
-Username: admin
-Password: admin123 (CHANGE IMMEDIATELY)
-```
+### Custom Admin Panel
+**Access:** http://localhost:8000/admin-dashboard/
+
+**Features:**
+- Dashboard overview
+- Product management (add/edit/delete)
+- Order management
+- Staff-only access with permission checks
 
 ---
 
@@ -260,29 +235,33 @@ Password: admin123 (CHANGE IMMEDIATELY)
 
 | Component | Technology | Purpose |
 |-----------|-----------|---------|
-| **Backend** | Django 3.2.8+ | Web framework |
-| **Database** | MySQL 8.0+ | Data storage |
+| **Backend** | Django 4.2.2 | Web framework |
+| **Database** | SQLite / MySQL 8.0+ | Data storage |
 | **Frontend** | HTML5, CSS3, Bootstrap | UI/UX |
 | **JavaScript** | Vanilla JS + jQuery | Interactivity |
 | **Payments** | Razorpay API | Transaction processing |
-| **SMS/OTP** | Twilio API | Phone authentication |
+| **SMS/OTP** | Twilio API | Phone authentication (optional) |
+| **Static Files** | WhiteNoise | Static file serving |
 | **Server** | Gunicorn + Nginx | Production deployment |
-| **Cache** | Redis (Optional) | Performance boost |
+| **Cache** | Redis / Local Memory | Performance boost |
 | **Container** | Docker Compose | Orchestration |
+| **i18n** | Django i18n | English & Hindi |
 
 ---
 
-## 📦 Installation & Dependencies
+## 📦 Dependencies
 
 ### Core Requirements
 ```
 Django==4.2.2
+djangorestframework==3.14.0
 PyMySQL==1.1.2
 Pillow==12.1.1
 razorpay==1.4.2
 twilio==9.10.1
 python-dotenv==1.2.1
-django-crispy-forms==1.14.0
+python-decouple==3.8
+whitenoise==6.11.0
 requests==2.32.5
 ```
 
@@ -309,7 +288,7 @@ docker-compose exec web python manage.py createsuperuser
 **3. Access:**
 - Website: http://localhost:8000/
 - Admin: http://localhost:8000/admin/
-- Database: localhost:3307
+- Database (MySQL): localhost:3307
 
 **4. Useful Commands:**
 ```bash
@@ -328,6 +307,11 @@ docker-compose down
 # Remove all data
 docker-compose down -v
 ```
+
+**Services:**
+- `web` - Django app (Python 3.12)
+- `mysql` - MySQL 8.0 database
+- `redis` - Redis 7 cache
 
 ---
 
@@ -348,47 +332,30 @@ python manage.py test                       # Run all tests
 python manage.py test apps.store            # Test specific app
 python manage.py test --verbosity=2         # Verbose output
 
+# Database Backup
+python database/backup_db.py               # Backup database
+python database/restore_db.py <file>       # Restore database
+
 # Utilities
 python manage.py shell                      # Django Python shell
 python manage.py runserver                  # Start dev server
 python manage.py dumpdata > backup.json    # Export data
 python manage.py loaddata backup.json      # Import data
-
-# See QUICK_REFERENCE.md for 50+ more commands
 ```
 
 ---
 
 ## 📚 Feature Documentation
 
-### 🔐 OTP Authentication System
-
-**Complete User Flow:**
-1. **Login Page:** Choose between OTP Login or Password Login
-2. **OTP Login Tab:**
-   - Enter registered phone number
-   - Click "Send OTP"
-   - Receive 6-digit code via SMS
-   - Enter code in verification field
-   - Click "Verify & Login"
-
-**Features:**
-- Auto-expiration after 5 minutes
-- Resend with 30-second cooldown
-- Change phone number option
-- Rate limiting prevents abuse
-- Complete transaction logging
-
 ### 💳 Smart Shopping Cart
 
 **For Guest Users (Cookie-Based):**
-- Stored in browser cookies
+- Stored in browser cookies (JSON format)
 - Persists across sessions
-- Uses JSON format
 - Automatic cleanup on cart clearing
 
 **For Authenticated Users (Database):**
-- Stored in SQL database
+- Stored in database
 - Persistent across devices
 - Real-time syncing
 - Complete history preserved
@@ -397,20 +364,19 @@ python manage.py loaddata backup.json      # Import data
 
 **Features:**
 - 1-5 star rating system
-- Text comments (max 500 chars)
+- Text comments
 - Average rating display
 - Review count display
 - Verified purchase badges
-- User-specific reviews
+- One review per user per product
 
 ### ❤️ Wishlist System
 
 **Functionality:**
-- One-click add/remove
-- Persistent storage
+- One-click add/remove toggle
+- Persistent database storage
 - Quick cart addition
-- Share wishlist
-- Email notifications
+- User-specific wishlists
 
 ### 🎟️ Coupon System
 
@@ -418,28 +384,37 @@ python manage.py loaddata backup.json      # Import data
 - Create discount codes
 - Set validity period
 - Usage limits
-- Percentage or fixed amount
+- Percentage-based discounts
 - Auto-validation
 
 **Customer Features:**
 - Apply at checkout
 - View discount before purchase
-- One coupon per order
 - Error messages for invalid codes
 
 ### 📧 Newsletter
 
 **Subscription:**
 - Footer subscribe form
-- Email confirmation required
+- Email validation
 - Automatic list management
-- Bulk send capability
 
-**Admin Management:**
-- View all subscribers
-- Send newsletters
-- Track opens/clicks
-- Unsubscribe management
+### 🧾 PDF Invoices
+
+**Features:**
+- Downloadable PDF invoices for completed orders
+- Available from order history and order success pages
+- Includes order details, items, pricing, and shipping info
+
+### 🌐 Multilingual Support
+
+**Languages:**
+- English (default)
+- Hindi
+
+**Usage:**
+- Language switcher in the UI
+- Translation files in `locale/` directory
 
 ---
 
@@ -463,7 +438,7 @@ docker-compose up -d
 python manage.py collectstatic --no-input
 
 # Run with Gunicorn
-gunicorn config.wsgi --bind 0.0.0.0:8000
+gunicorn config.ecommerce.wsgi --bind 0.0.0.0:8000
 
 # Use Nginx as reverse proxy (see nginx.conf)
 ```
@@ -475,8 +450,7 @@ gunicorn config.wsgi --bind 0.0.0.0:8000
 ### Development Tips
 - ✅ Keep DEBUG=True locally
 - ✅ Use .env for secrets
-- ✅ Test OTP with real numbers
-- ✅ Review logs regularly
+- ✅ Review logs regularly (`logs/ecommerce.log`)
 - ✅ Use virtual environment
 
 ### Production Tips
@@ -486,14 +460,13 @@ gunicorn config.wsgi --bind 0.0.0.0:8000
 - ✅ Regular database backups
 - ✅ Monitor error logs
 - ✅ Set up alerts
-- ✅ Regular updates
+- ✅ Regular dependency updates
 
 ### Performance
 - ✅ Use Redis caching
 - ✅ Optimize queries
-- ✅ Minify assets
+- ✅ Enable compression (WhiteNoise)
 - ✅ Use CDN
-- ✅ Enable compression
 - ✅ Lazy load images
 
 ---
@@ -543,26 +516,27 @@ Educational use. Modify and use freely.
 
 ## ✅ Project Status
 
-| Component | Status | Version |
-|-----------|--------|---------|
-| Core Features | ✅ Complete | 1.0 |
-| OTP Auth | ✅ Complete | 2.0 |
-| Payments | ✅ Complete | 2.0 |
-| Admin | ✅ Complete | 2.5 |
-| APIs | ✅ Complete | 2.5 |
-| Docker | ✅ Complete | 3.0 |
-| Security | ✅ Complete | 3.1 |
-| Docs | ✅ Complete | 3.1 |
+| Component | Status |
+|-----------|--------|
+| Core Features | ✅ Complete |
+| Authentication | ✅ Complete |
+| Razorpay Payments | ✅ Complete |
+| PDF Invoices | ✅ Complete |
+| Custom Admin Panel | ✅ Complete |
+| Docker Support | ✅ Complete |
+| i18n (EN/HI) | ✅ Complete |
+| Security Hardening | ✅ Complete |
+| Documentation | ✅ Complete |
 
 ---
 
 ## 📊 Version Information
 
 ```
-Current Version: 3.1 (Security Hardening Complete)
-Release Date: 2024
-Python: 3.8+
-Django: 4.2.2+
+Current Version: 4.0
+Last Updated: March 2026
+Python: 3.10+ (Docker: 3.12)
+Django: 4.2.2
 Status: ✅ PRODUCTION READY
 ```
 

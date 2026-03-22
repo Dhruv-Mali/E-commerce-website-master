@@ -9,11 +9,9 @@
 - [ ] HTTPS/SSL enabled
 - [ ] Database password changed
 - [ ] Email credentials secured
-- [ ] Payment keys in production mode
-- [ ] Twilio credentials updated
+- [ ] Razorpay keys in production mode
 - [ ] Security headers enabled
 - [ ] CSRF protection enabled
-- [ ] Rate limiting enabled
 
 ### Database
 - [ ] Database created
@@ -21,7 +19,6 @@
 - [ ] Superuser created
 - [ ] Backups configured
 - [ ] Database optimized
-- [ ] Indexes created
 
 ### Static Files
 - [ ] Static files collected
@@ -47,7 +44,7 @@ python manage.py shell
 # Copy output to .env
 ```
 
-### 1.2 Update .env File
+### 1.2 Create .env File
 ```env
 # Production settings
 DEBUG=False
@@ -67,17 +64,11 @@ EMAIL_HOST=smtp.gmail.com
 EMAIL_PORT=587
 EMAIL_HOST_USER=your_email@gmail.com
 EMAIL_HOST_PASSWORD=your_app_password
+EMAIL_USE_TLS=True
 
-# Payment
-STRIPE_PUBLIC_KEY=pk_live_your_key
-STRIPE_SECRET_KEY=sk_live_your_key
+# Payment - Razorpay
 RAZORPAY_KEY_ID=your_prod_key_id
 RAZORPAY_KEY_SECRET=your_prod_key_secret
-
-# Twilio
-TWILIO_ACCOUNT_SID=your_prod_sid
-TWILIO_AUTH_TOKEN=your_prod_token
-TWILIO_PHONE_NUMBER=+1234567890
 ```
 
 ### 1.3 Verify Settings
@@ -89,9 +80,15 @@ python manage.py check --deploy
 
 ## Step 2: Database Setup
 
-### 2.1 Create Database
+### 2.1 Option A: SQLite (Development / Small Deployments)
+SQLite is the default — no additional setup needed. Set in `.env`:
+```env
+DB_ENGINE=sqlite3
+```
+
+### 2.2 Option B: MySQL (Production)
 ```bash
-# MySQL
+# Create Database
 mysql -u root -p
 CREATE DATABASE ecommerce_prod CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 CREATE USER 'ecommerce_user'@'localhost' IDENTIFIED BY 'strong_password';
@@ -100,26 +97,28 @@ FLUSH PRIVILEGES;
 EXIT;
 ```
 
-### 2.2 Apply Migrations
+Set in `.env`:
+```env
+DB_ENGINE=mysql
+DB_NAME=ecommerce_prod
+DB_USER=ecommerce_user
+DB_PASSWORD=strong_password
+DB_HOST=localhost
+DB_PORT=3306
+```
+
+### 2.3 Apply Migrations
 ```bash
 python manage.py migrate
 ```
 
-### 2.3 Create Superuser
+### 2.4 Create Superuser
 ```bash
 python manage.py createsuperuser
 ```
 
-### 2.4 Load Sample Data (Optional)
+### 2.5 Optimize Database (MySQL)
 ```bash
-python manage.py loaddata initial_data.json
-```
-
-### 2.5 Optimize Database
-```bash
-# Create indexes
-python manage.py sqlsequencereset apps.store apps.loginsys | python manage.py dbshell
-
 # Analyze tables
 mysql -u ecommerce_user -p ecommerce_prod -e "ANALYZE TABLE store_product, store_order, store_customer;"
 ```
@@ -133,14 +132,21 @@ mysql -u ecommerce_user -p ecommerce_prod -e "ANALYZE TABLE store_product, store
 python manage.py collectstatic --no-input
 ```
 
+The project uses **WhiteNoise** for static file serving in production. It's already configured in `settings.py`:
+```python
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+```
+
 ### 3.2 Verify Collection
 ```bash
+# Windows
+dir staticfiles\
+# Linux/Mac
 ls -la staticfiles/
 ```
 
-### 3.3 Configure Web Server
+### 3.3 Configure Nginx for Static Files (Optional)
 ```nginx
-# nginx.conf
 location /static/ {
     alias /path/to/staticfiles/;
     expires 30d;
@@ -193,7 +199,7 @@ sudo systemctl start gunicorn
 ```
 
 ### 4.4 Configure Nginx
-```bash
+```nginx
 # /etc/nginx/sites-available/ecommerce
 upstream gunicorn {
     server unix:/run/gunicorn.sock fail_timeout=0;
@@ -202,8 +208,6 @@ upstream gunicorn {
 server {
     listen 80;
     server_name yourdomain.com www.yourdomain.com;
-    
-    # Redirect to HTTPS
     return 301 https://$server_name$request_uri;
 }
 
@@ -286,102 +290,52 @@ sudo systemctl start certbot.timer
 
 ## Step 6: Database Backups
 
-### 6.1 Create Backup Script
+### 6.1 Using Built-in Scripts
 ```bash
-#!/bin/bash
-# /usr/local/bin/backup_ecommerce.sh
+# Backup
+python database/backup_db.py
 
-BACKUP_DIR="/backups/ecommerce"
-DATE=$(date +%Y%m%d_%H%M%S)
-DB_NAME="ecommerce_prod"
-DB_USER="ecommerce_user"
-
-# Create backup directory
-mkdir -p $BACKUP_DIR
-
-# Backup database
-mysqldump -u $DB_USER -p$DB_PASSWORD $DB_NAME | gzip > $BACKUP_DIR/db_$DATE.sql.gz
-
-# Backup media files
-tar -czf $BACKUP_DIR/media_$DATE.tar.gz /path/to/media/
-
-# Keep only last 30 days
-find $BACKUP_DIR -name "*.gz" -mtime +30 -delete
-
-echo "Backup completed: $DATE"
+# Restore
+python database/restore_db.py database/backup_YYYYMMDD_HHMMSS.sql
 ```
 
-### 6.2 Schedule Backup
+### 6.2 Manual Backup (MySQL)
+```bash
+mysqldump -u ecommerce_user -p ecommerce_prod | gzip > backup_$(date +%Y%m%d).sql.gz
+```
+
+### 6.3 Schedule Backup (Cron)
 ```bash
 # Add to crontab
-0 2 * * * /usr/local/bin/backup_ecommerce.sh
+0 2 * * * cd /path/to/project && python database/backup_db.py
 ```
 
-### 6.3 Test Restore
+### 6.4 Django Data Export (SQLite or MySQL)
 ```bash
-# Test restore process monthly
-gunzip < backup.sql.gz | mysql -u user -p database
+python manage.py dumpdata > backup.json
+python manage.py loaddata backup.json
 ```
 
 ---
 
 ## Step 7: Monitoring & Logging
 
-### 7.1 Configure Logging
-```python
-# settings.py
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'verbose': {
-            'format': '{levelname} {asctime} {module} {message}',
-            'style': '{',
-        },
-    },
-    'handlers': {
-        'file': {
-            'level': 'INFO',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': '/var/log/ecommerce/django.log',
-            'maxBytes': 1024 * 1024 * 10,  # 10MB
-            'backupCount': 10,
-            'formatter': 'verbose',
-        },
-        'error_file': {
-            'level': 'ERROR',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': '/var/log/ecommerce/errors.log',
-            'maxBytes': 1024 * 1024 * 10,
-            'backupCount': 10,
-            'formatter': 'verbose',
-        },
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['file'],
-            'level': 'INFO',
-            'propagate': True,
-        },
-        'django.request': {
-            'handlers': ['error_file'],
-            'level': 'ERROR',
-            'propagate': False,
-        },
-    },
-}
-```
+### 7.1 Application Logging
+Django logging is already configured in `settings.py`:
+- Log file: `logs/ecommerce.log`
+- Max size: 5MB with 5 backups
+- Levels: INFO for Django, DEBUG for store app
 
 ### 7.2 Monitor Logs
 ```bash
-# Real-time log monitoring
-tail -f /var/log/ecommerce/django.log
+# Real-time log monitoring (Linux/Mac)
+tail -f logs/ecommerce.log
+
+# Windows
+type logs\ecommerce.log
 
 # Search for errors
-grep ERROR /var/log/ecommerce/django.log
-
-# Count errors
-grep ERROR /var/log/ecommerce/django.log | wc -l
+grep ERROR logs/ecommerce.log
 ```
 
 ### 7.3 Set Up Alerts
@@ -400,33 +354,24 @@ top -b -n 1 | head -20
 
 ## Step 8: Performance Optimization
 
-### 8.1 Enable Caching
-```python
-# settings.py
-CACHES = {
-    'default': {
-        'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': 'redis://127.0.0.1:6379/1',
-        'OPTIONS': {
-            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
-        }
-    }
-}
+### 8.1 Enable Redis Caching (Optional)
+The project supports Redis caching. Add to `.env`:
+```env
+CACHE_BACKEND=redis
+REDIS_URL=redis://127.0.0.1:6379/1
 ```
 
-### 8.2 Database Optimization
-```bash
-# Analyze query performance
-EXPLAIN SELECT * FROM store_product WHERE category = 'Electronics';
+Without Redis, local memory cache is used automatically.
 
-# Create indexes
-ALTER TABLE store_product ADD INDEX idx_category (category);
-ALTER TABLE store_order ADD INDEX idx_customer (customer_id);
+### 8.2 Database Optimization (MySQL)
+```bash
+# Create indexes (already defined in models)
+EXPLAIN SELECT * FROM store_product WHERE category = 'Electronics';
 ```
 
 ### 8.3 Compression
+WhiteNoise handles static file compression automatically. For Nginx:
 ```nginx
-# Enable gzip compression
 gzip on;
 gzip_types text/plain text/css text/javascript application/json;
 gzip_min_length 1000;
@@ -443,99 +388,42 @@ sudo ufw enable
 sudo ufw allow 22/tcp
 sudo ufw allow 80/tcp
 sudo ufw allow 443/tcp
-sudo ufw allow 3306/tcp  # MySQL (internal only)
 ```
 
 ### 9.2 SSH Security
 ```bash
 # Disable root login
 sed -i 's/^#PermitRootLogin yes/PermitRootLogin no/' /etc/ssh/sshd_config
-
-# Change SSH port
-sed -i 's/^#Port 22/Port 2222/' /etc/ssh/sshd_config
-
-# Restart SSH
 sudo systemctl restart sshd
 ```
 
 ### 9.3 Fail2Ban
 ```bash
-# Install
 sudo apt-get install fail2ban
-
-# Configure
-sudo cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
-
-# Enable
 sudo systemctl enable fail2ban
 sudo systemctl start fail2ban
 ```
 
 ---
 
-## Step 10: Monitoring & Maintenance
-
-### 10.1 Health Check
-```bash
-#!/bin/bash
-# /usr/local/bin/health_check.sh
-
-# Check Django
-curl -s http://localhost/health/ | grep -q "ok" || echo "Django down"
-
-# Check Database
-mysql -u user -p -e "SELECT 1" > /dev/null 2>&1 || echo "Database down"
-
-# Check Disk
-DISK=$(df / | awk 'NR==2 {print $5}' | sed 's/%//')
-if [ $DISK -gt 90 ]; then
-    echo "Disk usage critical: $DISK%"
-fi
-
-# Check Memory
-MEM=$(free | awk 'NR==2 {print int($3/$2 * 100)}')
-if [ $MEM -gt 90 ]; then
-    echo "Memory usage critical: $MEM%"
-fi
-```
-
-### 10.2 Schedule Health Check
-```bash
-# Add to crontab
-*/5 * * * * /usr/local/bin/health_check.sh
-```
-
-### 10.3 Regular Maintenance
-```bash
-# Weekly
-- Review error logs
-- Check disk space
-- Verify backups
-
-# Monthly
-- Update packages
-- Review security logs
-- Test backup restoration
-
-# Quarterly
-- Security audit
-- Performance review
-- Capacity planning
-```
-
----
-
-## Docker Deployment
+## Step 10: Docker Deployment
 
 ### 10.1 Build Docker Image
 ```bash
 docker build -t ecommerce:latest .
 ```
 
+The Dockerfile uses `python:3.12-slim` and installs dependencies from `requirements-docker.txt`.
+
 ### 10.2 Run with Docker Compose
 ```bash
 docker-compose up -d
 ```
+
+**Services started:**
+- `ecommerce-web` - Django app on port 8000
+- `ecommerce-mysql` - MySQL 8.0 on port 3307
+- `ecommerce-redis` - Redis 7 on port 6379
 
 ### 10.3 Initialize Database
 ```bash
@@ -546,6 +434,17 @@ docker-compose exec web python manage.py createsuperuser
 ### 10.4 Collect Static Files
 ```bash
 docker-compose exec web python manage.py collectstatic --no-input
+```
+
+### 10.5 View Logs
+```bash
+docker-compose logs -f web
+```
+
+### 10.6 Stop Services
+```bash
+docker-compose down      # Stop
+docker-compose down -v   # Stop and remove data
 ```
 
 ---
@@ -564,17 +463,18 @@ ls -la /run/gunicorn.sock
 
 ### Issue: Static Files Not Loading
 ```bash
-# Collect static files
 python manage.py collectstatic --no-input
 
 # Check permissions
-ls -la staticfiles/
 chmod -R 755 staticfiles/
 ```
 
 ### Issue: Database Connection Error
 ```bash
-# Check MySQL
+# SQLite - check file exists
+ls db.sqlite3
+
+# MySQL
 sudo systemctl status mysql
 mysql -u user -p -e "SELECT 1"
 
@@ -584,10 +484,19 @@ cat .env | grep DB_
 
 ### Issue: Email Not Sending
 ```bash
-# Test email configuration
 python manage.py shell
 >>> from django.core.mail import send_mail
 >>> send_mail('Test', 'Test message', 'from@example.com', ['to@example.com'])
+```
+
+### Issue: Razorpay Payment Failing
+```bash
+# Verify keys are set
+python manage.py shell
+>>> from django.conf import settings
+>>> print(settings.RAZORPAY_KEY_ID)
+
+# Check Razorpay dashboard for test mode
 ```
 
 ---
@@ -602,10 +511,10 @@ sudo systemctl stop nginx
 
 # Restore previous version
 git checkout previous_commit
-python manage.py migrate --fake-initial
+python manage.py migrate
 
 # Restore database backup
-gunzip < backup.sql.gz | mysql -u user -p database
+python database/restore_db.py database/backup_file.sql
 
 # Start services
 sudo systemctl start gunicorn
@@ -623,19 +532,13 @@ sudo systemctl start nginx
 - Uptime: 99.9%
 - Error rate: < 0.1%
 
-### Monitoring Tools
-- New Relic
-- Datadog
-- Sentry
-- CloudWatch
-- Prometheus
-
 ---
 
 ## Support & Documentation
 
-- Django Deployment: https://docs.djangoproject.com/en/stable/howto/deployment/
+- Django Deployment: https://docs.djangoproject.com/en/4.2/howto/deployment/
 - Gunicorn: https://gunicorn.org/
 - Nginx: https://nginx.org/
 - Let's Encrypt: https://letsencrypt.org/
 - MySQL: https://dev.mysql.com/
+- Razorpay Docs: https://razorpay.com/docs/
