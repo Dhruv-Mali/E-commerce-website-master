@@ -7,15 +7,15 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     pkg-config \
+    python3-dev \
     libmariadb-dev-compat \
     libmariadb-dev \
     libpq-dev \
     libjpeg-dev \
     zlib1g-dev \
     libffi-dev \
-    libcairo2 \
-    libpango-1.0-0 \
-    libpangocairo-1.0-0 \
+    libcairo2-dev \
+    libpango1.0-dev \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
