@@ -118,6 +118,16 @@ def admin_orders(request):
     context = {'orders': orders}
     return render(request, 'admin/orders.html', context)
 
+@staff_member_required(login_url='/l/')
+def admin_order_detail(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    items = order.orderitem_set.all()
+    shipping_address = None
+    if order.shipping:
+        shipping_address = ShippingAddress.objects.filter(order=order).first()
+    context = {'order': order, 'items': items, 'shipping_address': shipping_address}
+    return render(request, 'admin/order_detail.html', context)
+
 def landing(request):
     return render(request, 'store/landing.html')
 
@@ -184,57 +194,25 @@ def cart(request):
     return render(request, 'store/cart.html', context)
 
 def checkout(request):
-    if request.user.is_authenticated:
-        customer, created = Customer.objects.get_or_create(
-            user=request.user,
-            defaults={'name': request.user.username, 'email': request.user.email}
-        )
-        order = Order.objects.filter(customer=customer, complete=False).first()
-        if not order:
-            order = Order.objects.create(customer=customer, complete=False)
-        items = order.orderitem_set.all()
-    else:
-        cookieData = cookieCart(request)
-        order = cookieData['order']
-        items = cookieData['items']
+    if not request.user.is_authenticated:
+        return redirect('login')
+
+    customer, created = Customer.objects.get_or_create(
+        user=request.user,
+        defaults={'name': request.user.username, 'email': request.user.email}
+    )
+    order = Order.objects.filter(customer=customer, complete=False).first()
+    if not order:
+        order = Order.objects.create(customer=customer, complete=False)
+    items = order.orderitem_set.all()
 
     razorpay_order = None
     razorpay_order_id = None
 
     if request.method == 'POST' and request.POST.get('make-payment-btn'):
         try:
-            if request.user.is_authenticated:
-                order_id = order.id
-                total_amount = order.get_cart_total
-            else:
-                # Create guest customer and order before payment
-                guest_email = request.POST.get('email', '')
-                guest_name = request.POST.get('name', '')
-                
-                if not guest_email:
-                    messages.error(request, 'Email is required for checkout.')
-                    return render(request, 'store/checkout.html', {'items': items, 'order': order})
-                
-                customer, created = Customer.objects.get_or_create(
-                    email=guest_email,
-                    user=None,
-                    defaults={'name': guest_name}
-                )
-                
-                # Create order for guest
-                order_obj = Order.objects.create(customer=customer, complete=False)
-                
-                # Add items from cookie cart to order
-                for item in items:
-                    product = Product.objects.get(id=item['product']['id'])
-                    OrderItem.objects.create(
-                        product=product,
-                        order=order_obj,
-                        quantity=item['quantity']
-                    )
-                
-                order_id = order_obj.id
-                total_amount = order_obj.get_cart_total
+            order_id = order.id
+            total_amount = order.get_cart_total
             
             # Create Razorpay order (amount in paise)
             razorpay_order = create_razorpay_order(int(total_amount * 100))
@@ -442,46 +420,21 @@ def updateItem(request):
 
 @require_POST
 def processOrder(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({"error": "User not authenticated"}, status=401)
+
     try:
         data = json.loads(request.body)
         
         with transaction.atomic():
-            if request.user.is_authenticated:
-                customer, created = Customer.objects.get_or_create(
-                    user=request.user,
-                    defaults={'name': request.user.username, 'email': request.user.email}
-                )
-                # Get the most recent incomplete order or create a new one
-                order = Order.objects.filter(customer=customer, complete=False).first()
-                if not order:
-                    order = Order.objects.create(customer=customer, complete=False)
-            else:
-                name = data['form']['name']
-                email = data['form']['email']
-                cookieData = cookieCart(request)
-                items = cookieData['items']
-
-                customer, created = Customer.objects.get_or_create(
-                    email=email,
-                    user=None,
-                    defaults={'name': name}
-                )
-                if not created:
-                    customer.name = name
-                    customer.save()
-
-                order = Order.objects.create(
-                    customer=customer,
-                    complete=False,
-                )
-
-                for item in items:
-                    product = Product.objects.get(id=item['product']['id'])
-                    OrderItem.objects.create(
-                        product=product,
-                        order=order,
-                        quantity=item['quantity']
-                    )
+            customer, created = Customer.objects.get_or_create(
+                user=request.user,
+                defaults={'name': request.user.username, 'email': request.user.email}
+            )
+            # Get the most recent incomplete order or create a new one
+            order = Order.objects.filter(customer=customer, complete=False).first()
+            if not order:
+                order = Order.objects.create(customer=customer, complete=False)
 
             submitted_total = float(data['form']['total'])
             try:

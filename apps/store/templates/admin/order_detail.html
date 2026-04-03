@@ -1,0 +1,136 @@
+{% extends 'index.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid mt-5">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <a href="{% url 'admin_orders' %}" class="btn btn-outline-secondary btn-sm mb-3 back-btn" style="color: #999; border-color: #444;">
+                        <i class="fas fa-arrow-left"></i> Back to Orders
+                    </a>
+                    <h1 class="page-title" style="color: #EDEDED;">
+                        <i class="fas fa-file-invoice"></i> Order Details #{{ order.id }}
+                    </h1>
+                    <p class="text-muted">Transaction ID: {{ order.transaction_id|default:"N/A" }}</p>
+                </div>
+                <div>
+                    {% if order.status == 'pending' %}
+                        <span class="badge" style="background: #FFC107; color: #000; font-size: 1rem; padding: 10px 15px;">Pending</span>
+                    {% elif order.status == 'processing' %}
+                        <span class="badge" style="background: #00C2FF; color: #000; font-size: 1rem; padding: 10px 15px;">Processing</span>
+                    {% elif order.status == 'shipped' %}
+                        <span class="badge" style="background: #2196F3; font-size: 1rem; padding: 10px 15px;">Shipped</span>
+                    {% elif order.status == 'delivered' %}
+                        <span class="badge" style="background: #4CAF50; font-size: 1rem; padding: 10px 15px;">Delivered</span>
+                    {% elif order.status == 'cancelled' %}
+                        <span class="badge" style="background: #F44336; font-size: 1rem; padding: 10px 15px;">Cancelled</span>
+                    {% else %}
+                        <span class="badge" style="background: #555; font-size: 1rem; padding: 10px 15px;">{{ order.status }}</span>
+                    {% endif %}
+                </div>
+            </div>
+            <hr style="border-color: #444;">
+        </div>
+    </div>
+
+    <!-- Details Sections -->
+    <div class="row">
+        <!-- Customer & Shipping Info -->
+        <div class="col-lg-4 mb-4">
+            <div class="card h-100" style="background: #1a1a1a; border: 1px solid #333; border-radius: 10px;">
+                <div class="card-body">
+                    <h5 class="card-title text-light mb-4" style="border-bottom: 1px solid #333; padding-bottom: 10px;">
+                        <i class="fas fa-user" style="color: #7B61FF;"></i> Customer Information
+                    </h5>
+                    {% if order.customer %}
+                    <p class="text-muted mb-2"><strong>Name:</strong> <span style="color: #EDEDED;">{{ order.customer.name|default:"Guest" }}</span></p>
+                    <p class="text-muted mb-2"><strong>Email:</strong> <span style="color: #EDEDED;">{{ order.customer.email|default:"N/A" }}</span></p>
+                    {% else %}
+                    <p class="text-muted mb-2">Guest Checkout</p>
+                    {% endif %}
+                    
+                    <h5 class="card-title text-light mt-5 mb-4" style="border-bottom: 1px solid #333; padding-bottom: 10px;">
+                        <i class="fas fa-truck" style="color: #00C2FF;"></i> Shipping Address
+                    </h5>
+                    {% if shipping_address %}
+                    <p class="text-muted mb-1"><span style="color: #EDEDED;">{{ shipping_address.address }}</span></p>
+                    <p class="text-muted mb-1"><span style="color: #EDEDED;">{{ shipping_address.city }}, {{ shipping_address.state }} {{ shipping_address.zipcode }}</span></p>
+                    {% else %}
+                    <p class="text-muted">Digital Product / No Shipping Required</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Order Items -->
+        <div class="col-lg-8 mb-4">
+            <div class="card h-100" style="background: #1a1a1a; border: 1px solid #333; border-radius: 10px;">
+                <div class="card-body">
+                    <h5 class="card-title text-light mb-4" style="border-bottom: 1px solid #333; padding-bottom: 10px;">
+                        <i class="fas fa-box" style="color: #FFB703;"></i> Order Items
+                    </h5>
+                    <div class="table-responsive">
+                        <table class="table table-borderless" style="color: #EDEDED;">
+                            <thead>
+                                <tr style="border-bottom: 1px solid #333;">
+                                    <th style="color: #888;">Product</th>
+                                    <th style="color: #888; text-align: center;">Quantity</th>
+                                    <th style="color: #888; text-align: right;">Price</th>
+                                    <th style="color: #888; text-align: right;">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in items %}
+                                <tr style="border-bottom: 1px solid #222;">
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            {% if item.product.image %}
+                                                <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px; margin-right: 15px;">
+                                            {% else %}
+                                                <div style="width: 50px; height: 50px; background: #333; border-radius: 5px; margin-right: 15px; display: flex; align-items: center; justify-content: center; color: #555;">
+                                                    <i class="fas fa-image"></i>
+                                                </div>
+                                            {% endif %}
+                                            <span>{{ item.product.name }}</span>
+                                        </div>
+                                    </td>
+                                    <td align="center" style="vertical-align: middle;">{{ item.quantity }}</td>
+                                    <td align="right" style="vertical-align: middle;">₹{{ item.product.price|floatformat:2 }}</td>
+                                    <td align="right" style="vertical-align: middle;"><strong>₹{{ item.get_total|floatformat:2 }}</strong></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="3" align="right" style="padding-top: 20px;">
+                                        <h5 style="color: #aaa; margin: 0;">Total Amount:</h5>
+                                    </td>
+                                    <td align="right" style="padding-top: 20px;">
+                                        <h4 style="color: #FFB703; margin: 0;">₹{{ order.get_cart_total|floatformat:2 }}</h4>
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .page-title {
+        font-size: 2rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+    }
+    
+    .back-btn:hover {
+        background: rgba(255,255,255,0.1);
+        color: #fff !important;
+    }
+</style>
+{% endblock %}

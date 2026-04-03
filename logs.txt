@@ -4,7 +4,7 @@ System check identified no issues (0 silenced).
 Exception in thread django-main-thread:
 Traceback (most recent call last):
   File "/usr/local/lib/python3.12/site-packages/pymysql/connections.py", line 644, in connect
-    sock = socket.create_connection(
+    sock = socket.create_connection
            ^^^^^^^^^^^^^^^^^^^^^^^^^
   File "/usr/local/lib/python3.12/socket.py", line 865, in create_connection
     raise exceptions[0]
