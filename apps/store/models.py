@@ -162,9 +162,13 @@ class ShippingAddress(models.Model):
 
 @receiver(post_save, sender=User)
 def create_customer(sender, instance, created, **kwargs):
-    if created:
-        Customer.objects.create(
+    # Prevent signal from running during loaddata (kwargs.get('raw')) 
+    # to avoid IntegrityError when Customer fixtures are loaded.
+    if created and not kwargs.get('raw', False):
+        Customer.objects.get_or_create(
             user=instance,
-            name=instance.username,
-            email=instance.email
+            defaults={
+                'name': instance.username,
+                'email': instance.email
+            }
         )

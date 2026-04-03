@@ -38,5 +38,15 @@ RUN python manage.py collectstatic --no-input
 ENV PORT=10000
 EXPOSE $PORT
 
-# Run database migrations and start the Gunicorn server
-CMD python manage.py migrate && gunicorn config.ecommerce.wsgi:application --bind 0.0.0.0:$PORT
+# Wait for MySQL to be ready, then migrate and start Gunicorn
+CMD sh -c '\
+  echo "Waiting for MySQL..."; \
+  for i in $(seq 1 30); do \
+    python -c "import pymysql; pymysql.connect(host=\"${DB_HOST:-mysql}\", port=int(\"${DB_PORT:-3306}\"), user=\"${DB_USER:-root}\", password=\"${DB_PASSWORD:-}\", db=\"${DB_NAME:-ecommerce_db}\")" 2>/dev/null && break; \
+    echo "MySQL not ready, retrying ($i/30)..."; \
+    sleep 2; \
+  done; \
+  echo "MySQL is ready! Running migrations..."; \
+  python manage.py migrate && \
+  gunicorn config.ecommerce.wsgi:application --bind 0.0.0.0:$PORT \
+'
