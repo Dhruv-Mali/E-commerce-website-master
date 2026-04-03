@@ -9,6 +9,7 @@ services:
     ports:
       - "8000:8000"
     environment:
+      - PORT=8000
       - DEBUG=${DEBUG}
       - SECRET_KEY=${SECRET_KEY}
       - RAZORPAY_KEY_ID=${RAZORPAY_KEY_ID}
